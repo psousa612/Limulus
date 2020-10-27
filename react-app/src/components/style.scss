@@ -1,0 +1,5 @@
+@use 'colors' as colors;
+
+body {
+    background-color: colors.$bg-primary-color;
+}
