@@ -1,0 +1,29 @@
+@use 'colors' as colors;
+
+
+.panel {
+    padding-bottom: 3em;
+    padding-top: 3em;
+    text-align: center;
+    width: 50%;
+    
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 25px;
+
+    background-color: gray;
+
+
+    table {
+        background-color: pink;
+        width: 100%;
+        r
+        th {
+            border-bottom: 1px black;
+        }
+
+        tr {
+            height: 5em;
+        }
+    }
+}
