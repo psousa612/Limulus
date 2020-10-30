@@ -46,4 +46,21 @@ def login():
 @app.route("/signout", METHODS = ["POST"])
 def signout():
     return("Signed out")
+
+#Create User API
+@app.route("/createuser", METHODS = ["POST"])
+#TODO: Check for duplicate usernames
+def createuser():
+    username = str(request.form.get("username").upper())
+    password = str(request.form.get("password"))
+    passwordConf = str(request.form.get("passwordConf"))
+    if(passwordConf != password):
+        return("passwords dont match")
+    else:
+        passwordHash = hashlib.sha256()
+        passwordHash.update(password.encode('utf8'))
+        hashedPassword = str(passwordHash.hexdigest())
+        db.execute("INSERT INTO users VALUES (:username, :hashedPassword)",{"username":username, "hashedPassword":hashedPassword})
+        db.commit()
+        return("User Created")
     
