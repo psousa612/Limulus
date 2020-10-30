@@ -41,4 +41,9 @@ def login():
         return("Logged in")
     else:
         return("Wrong Username or Password")
+
+# SIGNOUT API
+@app.route("/signout", METHODS = ["POST"])
+def signout():
+    return("Signed out")
     
