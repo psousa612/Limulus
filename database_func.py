@@ -4,6 +4,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 import traceback
 import hashlib
 import requests
+import random
 
 
 #Function Definitions
@@ -65,11 +66,7 @@ def database_init():
     
     db.commit()
 
-#Store questions here, call more links for different questions
 
-#Math questions: https://opentdb.com/api.php?amount=20&category=19&type=multiple
-#Science: Gadget: https://opentdb.com/api.php?amount=10&category=30&type=multiple
-#Video Games:  https://opentdb.com/api.php?amount=10&category=15&type=multiple
 
 def database_insert_examples():
     print("this is where i would insert values into the tables..... if i had tables")
@@ -93,7 +90,9 @@ def update_points(uname):
 
 ##Leaderboard functions
 def refresh_leaderboard():
-    print("yer")
+    # db.execute("""DELETE FROM leaderboard""")
+    print('hi')
+    # db.execute()
 
 def fetch_top10():
     print("yer")
@@ -101,15 +100,13 @@ def fetch_top10():
 
 ##Question functions
 def get_categories():
-    print("yer")
-
+    return db.execute("SELECT DISTINCT category FROM questions")
 
 def random_question():
-    print("yer")
+    return db.execute("SELECT * FROM questions ORDER BY RANDOM() LIMIT 1")
 
 def random_question_with_category(category):
-    #print category selection menu here
-    print('hi')
+    return db.execute("SELECT * FROM questions WHERE category = :cat ORDER BY RANDOM() LIMIT 1", {"cat":category})
     
 
 def get_question_stats():
@@ -134,12 +131,75 @@ def get_questions_from_user():
     print("yer")
 
 
-def random_question_prompt():
-    question = random_question()
-    print(question)
+def quiz_prompt(question):
+    print("####################################")
+    os.system('clear')
 
-def random_question_with_category_prompt():
-    print('y')
+    choices = []
+    question_info = [] #[0] = question_id, [1] = prompt, [2] = correct, [3] = category
+    for row in question:
+        question_info.append(row[0])
+        question_info.append(row[2])
+
+        question_info.append(row[3])
+        choices.append(row[3])
+        choices.append(row[4])
+        choices.append(row[5])
+        choices.append(row[6])
+
+        question_info.append(row[1])
+
+    random.shuffle(choices)
+
+    print("Category: {}".format(question_info[3]))
+
+    print("\nQuestion: ")
+    print(question_info[1])
+    
+    print("\nChoices: ")
+    for i in range(1, 5):
+        print("[{}] {}".format(i, choices[i-1]))
+
+    try:
+        answer = int(input("Please put in your answer: "))
+    except Exception as e:
+        print("Invalid input! :(")
+        return
+
+    if answer > 4 or answer < 1:
+        print("Invalid input! :(")
+        return
+
+
+    if choices[answer-1] == question_info[2]:
+        print("Congrats, you got it!")
+    else:
+        print("Wrong Answer! :(")
+
+
+    input("Press Enter to continue...")
+
+def category_prompt():
+    choice = ''
+    while choice != 'q':
+        cats = get_categories()
+        categories = []
+        for row in cats:
+            categories.append(row[0])
+        
+        for i in range(1, len(categories)):
+            print("[{}] {}".format(i,categories[i-1]))
+
+        choice = input("Please enter which category you want: ")
+
+        # if answer < 1 or answer > len(categories):
+        #     print("Invalid input! :(")
+        #     return
+
+        if choice != 'q':
+            return categories[int(choice)-1]
+        
+
 
 
 def question_prompt():
@@ -148,16 +208,22 @@ def question_prompt():
         print("####################################")
         os.system('clear')
 
-        print("[1] Random Question")
-        print("[2] Question From Specific Category")
+        print("[1] Print Categories")
+        print("[2] Random Question")
+        print("[3] Question From Specific Category")
         print("[q] Go Back")
         
         choice = input("Enter in your selection: ")
-
         if choice == '1':
-            random_question_prompt()
+            result = get_categories()
+            for row in result:
+                print(row[0])
+            input("Press Enter to continue...")
         elif choice == '2':
-            random_question_with_category_prompt()
+            quiz_prompt(random_question())
+        elif choice == '3':
+            quiz_prompt(random_question_with_category(category_prompt()))
+        
 
         
 ##Misc Functions
@@ -241,7 +307,8 @@ Welcome to.....
     print("##########################################")
     print("[1] View tables")
     print("[2] Questions")
-    print("[3] ")
+    print("[3] Users")
+    # print("[4] ")
 
     print("[q] quit")
 
