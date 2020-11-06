@@ -9,93 +9,30 @@ import random
 
 #Function Definitions
 
-##DB Init Functions
-def database_init():
-    db.execute("""CREATE TABLE IF NOT EXISTS users (
-                    user_key SERIAL PRIMARY KEY,
-                    user_name TEXT UNIQUE NOT NULL,
-                    email TEXT UNIQUE NOT NULL,
-                    first_name TEXT,
-                    last_name TEXT,
-                    age INTEGER,
-                    location TEXT,
-                    school TEXT,
-                    points INTEGER NOT NULL);""")
-
-    db.execute("""CREATE TABLE IF NOT EXISTS questions (
-                    question_key SERIAL PRIMARY KEY,
-                    category TEXT NOT NULL,
-                    prompt TEXT NOT NULL,
-                    correct TEXT NOT NULL,
-                    wrong1 TEXT NOT NULL,
-                    wrong2 TEXT NOT NULL,
-                    wrong3 TEXT NOT NULL);""")
-
-
-    db.execute("""CREATE TABLE IF NOT EXISTS question_stats (
-            question_key INTEGER PRIMARY KEY,
-            total_amt INTEGER DEFAULT 0,
-            total_correct INTEGER DEFAULT 0,
-            total_first_try_correct INTEGER DEFAULT 0);""")
-
-
-    db.execute("""CREATE TABLE IF NOT EXISTS leaderboard (
-            ranking INTEGER PRIMARY KEY,
-            user_key INTEGER NOT NULL UNIQUE,
-            points INTEGER NOT NULL);""")
-
-    db.execute("""CREATE TABLE IF NOT EXISTS friends (
-            user_key INTEGER NOT NULL,
-            friend_key INTEGER NOT NULL);""")
-
-    db.execute("""CREATE TABLE IF NOT EXISTS question_history (
-            user_key INTEGER PRIMARY KEY,
-            question_key INTEGER NOT NULL,
-            date DATE);""")
-
-    #Insert questions from Open Trivia DB
-    response = requests.get("https://opentdb.com/api.php?amount=20&category=18&type=multiple")
-    results = response.json()["results"]
-    
-    for row in results:
-        db.execute("""INSERT INTO questions(category, prompt, correct, wrong1, wrong2, wrong3) 
-                        VALUES(:category, :prompt, :correct, :wrong1, :wrong2, :wrong3)""", {
-                                "category":row["category"], "prompt":row["question"],
-                                "correct":row["correct_answer"], "wrong1":row["incorrect_answers"][0],
-                                "wrong2":row["incorrect_answers"][1], "wrong3":row["incorrect_answers"][2]})
-    
-    db.commit()
-
-
-
-def database_insert_examples():
-    print("this is where i would insert values into the tables..... if i had tables")
-
 
 ##User Functions
-def login():
+def login(username, password):
     uname = input("Enter the username: ")
     password = input("Enter the password: ")
 
+    return db.execute("SELECT * FROM users WHERE user_name = :uname AND password = :pass LIMIT 1")
     #query here
 
-def signup():
+def signup(info):
     uname = input("Enter the username: ")
     password = input("Enter the password: ")
 
     #query here
 
 def update_points(uname):
-    print("yer")
+    pass
 
 ##Leaderboard functions
 def refresh_leaderboard():
-    # db.execute("""DELETE FROM leaderboard""")
-    print('hi')
-    # db.execute()
+    pass
 
 def fetch_top10():
-    print("yer")
+    pass
 
 
 ##Question functions
@@ -110,27 +47,27 @@ def random_question_with_category(category):
     
 
 def get_question_stats():
-    print("yer")
+    pass
 
 def random_question_with_stats():
-    print("yer")
+    pass
 
 def update_question_stats_wrong(q_key):
-    print("yer")
+    pass
 
 def update_question_stats_correct_first_try(q_key):
-    print("yer")
+    pass
 
 def update_question_stats_correct(q_key):
-    print("yer")
+    pass
 
 def insert_question():
-    print("yer")
+    pass
 
 def get_questions_from_user():
-    print("yer")
+    pass
 
-
+##Prompts
 def quiz_prompt(question):
     print("####################################")
     os.system('clear')
@@ -187,7 +124,7 @@ def category_prompt():
         for row in cats:
             categories.append(row[0])
         
-        for i in range(1, len(categories)):
+        for i in range(1, len(categories)+1):
             print("[{}] {}".format(i,categories[i-1]))
 
         choice = input("Please enter which category you want: ")
@@ -197,10 +134,7 @@ def category_prompt():
         #     return
 
         if choice != 'q':
-            return categories[int(choice)-1]
-        
-
-
+            return categories[int(choice)-1]      
 
 def question_prompt():
     choice = ''
@@ -218,14 +152,66 @@ def question_prompt():
             result = get_categories()
             for row in result:
                 print(row[0])
+            
             input("Press Enter to continue...")
         elif choice == '2':
             quiz_prompt(random_question())
         elif choice == '3':
             quiz_prompt(random_question_with_category(category_prompt()))
-        
 
-        
+def login_prompt():
+    choice = ''
+    while choice != 'q':
+        print("####################################")
+        os.system('clear')
+
+        uname = input("Enter in your username: ")
+        password = input("Enter in your password:")
+
+        result = login(username, password)
+
+def signup_prompt():
+    choice = ''
+    while choice != 'q':
+        print("####################################")
+        os.system('clear')
+
+        info = []
+        info.append(input("Enter in your username: "))
+        info.append(input("Enter in your email: "))
+        info.append(input("Enter in your password: "))
+
+        print("\n####################################")
+        print("The following questions are optional.")
+
+        info.append(input("First Name: "))
+        info.append(input("Last Name: "))
+        info.append(int(input("Age: ")))
+        info.append(input("Location: "))
+        info.append(input("School: "))
+
+        signup(info)
+
+        input("Thanks for signing up! Press Enter to continue...")
+
+def user_prompt():
+    choice = ''
+    while choice != 'q':
+        print("####################################")
+        os.system('clear')
+
+        print("[1] Log In")
+        print("[2] Sign Up")
+        print("[q] Go Back")
+
+        choice = input("Enter in your selection: ")
+        if choice == '1':
+            login_prompt()
+        elif choice == '2':
+            signup_prompt()
+
+
+
 ##Misc Functions
 def print_table(table_name):
     result = db.execute("SELECT * FROM :table_name", {"table_name":table_name})
@@ -284,10 +270,6 @@ if not os.getenv("SECRET_KEY"):
 
 engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
-database_init()
-
-print("\Inserting example values...")
-database_insert_examples()
 
 os.system('clear')
 
@@ -319,7 +301,7 @@ Welcome to.....
     elif choice == '2':
         question_prompt()
     elif choice == '3':
-        print("asd")
+        user_prompt()
     elif choice == '9':
         db.execute("DELETE FROM questions")
         db.commit()

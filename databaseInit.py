@@ -11,9 +11,11 @@ engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
 
 def database_init():
+
         db.execute("""CREATE TABLE IF NOT EXISTS users (
                         user_key SERIAL PRIMARY KEY,
                         user_name TEXT UNIQUE NOT NULL,
+                        password TEXT NOT NULL,
                         email TEXT UNIQUE NOT NULL,
                         first_name TEXT,
                         last_name TEXT,
@@ -58,11 +60,12 @@ def database_init():
         #Science: Gadget: https://opentdb.com/api.php?amount=10&category=30&type=multiple
         #Video Games:  https://opentdb.com/api.php?amount=10&category=15&type=multiple
 
-        populateTable("https://opentdb.com/api.php?amount=20&category=18&type=multiple")
-        populateTable("https://opentdb.com/api.php?amount=15&category=19&type=multiple")
-        populateTable("https://opentdb.com/api.php?amount=15&category=30&type=multiple")
-        populateTable("https://opentdb.com/api.php?amount=10&category=15&type=multiple")
+        populateTable("https://opentdb.com/api.php?amount=30&category=18&type=multiple")
+        populateTable("https://opentdb.com/api.php?amount=30&category=19&type=multiple")
+        populateTable("https://opentdb.com/api.php?amount=30&category=30&type=multiple")
+        populateTable("https://opentdb.com/api.php?amount=30&category=15&type=multiple")
 
+        populateUsers()
         db.commit()
 
 def populateTable(url):
@@ -76,7 +79,40 @@ def populateTable(url):
                                 "category":row["category"], "prompt":row["question"],
                                 "correct":row["correct_answer"], "wrong1":row["incorrect_answers"][0],
                                 "wrong2":row["incorrect_answers"][1], "wrong3":row["incorrect_answers"][2]})
+                db.execute("")
 
         db.commit()
+
+def populateUsers():
+        users = [["ySharma", "yash@yash.com", "abc123", "Yash", "Sharma", 18, None, "UCMerced", 0],
+                ["bbridi", "bbbbbbbbridi@protonmail.com", "securePassword99", "Busher", None, 29, None, "UCMerced", 0],
+                ["psousa", "spam@gmail.com", "theseWillBeHashedEventually", None, "Sousa", 21, "San Jose", "UCMerced", 0]]
+        
+        for row in users:
+                db.execute("""INSERT INTO users(user_name, email, password, first_name, last_name, age, location, school, points) 
+                                VALUES(:uname, :email, :password, :f_name, :l_name, :age, :loc, :school, :points)""", {
+                                        "uname": row[0],
+                                        "email": row[1],
+                                        "password": row[2],
+                                        "f_name": row[3],
+                                        "l_name": row[4],
+                                        "age": row[5],
+                                        "loc": row[6],
+                                        "school": row[7],
+                                        "points": row[8]
+                                })
+
+"""                        user_name TEXT UNIQUE NOT NULL,
+                        email TEXT UNIQUE NOT NULL,
+                        first_name TEXT,
+                        last_name TEXT,
+                        age INTEGER,
+                        location TEXT,
+                        school TEXT,
+                        points INTEGER NOT NULL"""
+
+
+def populateQuestionStats():
+        print("question stats")
 
 database_init()
