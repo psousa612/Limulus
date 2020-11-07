@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, session, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from flask_session import Session
 from sqlalchemy import create_engine, exc
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -20,7 +20,7 @@ if not os.getenv("SECRET_KEY"):
 engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
 # ROOT
-@app.route("/", METHOD=["GET", "POST"])
+@app.route("/", methods=["GET", "POST"])
 def index():
     if(request.method == "GET"):
         return render_template("index.html")
@@ -28,17 +28,19 @@ def index():
         return("uhh, what you tryin brah?")
 
 # LOGIN API
-@app.route("/login", METHODS=["POST"])
+@app.route("/login", methods=["POST"])
 def login():
-    username = str(request.form.get("username").upper())
-    password = str(request.form.get("password"))
+    login_params = request.get_json()
+    username = str(login_params["username"])
+    password = str(login_params["password"])
     passwordHash = hashlib.sha256()
     passwordHash.update(password.encode('utf8'))
     hashedPassword = str(passwordHash.hexdigest())
-    if(db.execute("SELECT * FROM users WHERE upper(username) =:username AND password = :password", {"username": username, "password": hashedPassword}).rowcount == 1):
-        user = db.execute("SELECT username FROM users WHERE upper(username) =:username", {
+    if(db.execute("SELECT * FROM users WHERE upper(user_name) =:username AND password = :password", {"username": username, "password": hashedPassword}).rowcount == 1):
+        user = db.execute("SELECT user_name FROM users WHERE upper(user_name) =:username", {
                           "username": username}).fetchone()
         return("Logged in")
     else:
         return("Wrong Username or Password")
     
+   
