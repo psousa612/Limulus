@@ -31,7 +31,8 @@ def database_init():
                         correct TEXT NOT NULL,
                         wrong1 TEXT NOT NULL,
                         wrong2 TEXT NOT NULL,
-                        wrong3 TEXT NOT NULL);""")
+                        wrong3 TEXT NOT NULL,
+                        author_key INTEGER DEFAULT -1 NOT NULL);""")
 
 
         db.execute("""CREATE TABLE IF NOT EXISTS question_stats (
@@ -42,7 +43,6 @@ def database_init():
 
 
         db.execute("""CREATE TABLE IF NOT EXISTS leaderboard (
-                ranking INTEGER PRIMARY KEY,
                 user_key INTEGER NOT NULL UNIQUE,
                 points INTEGER NOT NULL);""")
 
@@ -60,12 +60,12 @@ def database_init():
         #Science: Gadget: https://opentdb.com/api.php?amount=10&category=30&type=multiple
         #Video Games:  https://opentdb.com/api.php?amount=10&category=15&type=multiple
 
-        populateTable("https://opentdb.com/api.php?amount=30&category=18&type=multiple")
-        populateTable("https://opentdb.com/api.php?amount=30&category=19&type=multiple")
-        populateTable("https://opentdb.com/api.php?amount=30&category=30&type=multiple")
-        populateTable("https://opentdb.com/api.php?amount=30&category=15&type=multiple")
+        # populateTable("https://opentdb.com/api.php?amount=30&category=18&type=multiple")
+        # populateTable("https://opentdb.com/api.php?amount=30&category=19&type=multiple")
+        # populateTable("https://opentdb.com/api.php?amount=30&category=30&type=multiple")
+        # populateTable("https://opentdb.com/api.php?amount=30&category=15&type=multiple")
 
-        populateUsers()
+        # populateUsers()
         db.commit()
 
 def populateTable(url):
@@ -79,7 +79,6 @@ def populateTable(url):
                                 "category":row["category"], "prompt":row["question"],
                                 "correct":row["correct_answer"], "wrong1":row["incorrect_answers"][0],
                                 "wrong2":row["incorrect_answers"][1], "wrong3":row["incorrect_answers"][2]})
-                db.execute("")
 
         db.commit()
 
@@ -99,17 +98,7 @@ def populateUsers():
                                         "age": row[5],
                                         "loc": row[6],
                                         "school": row[7],
-                                        "points": row[8]
-                                })
-
-"""                        user_name TEXT UNIQUE NOT NULL,
-                        email TEXT UNIQUE NOT NULL,
-                        first_name TEXT,
-                        last_name TEXT,
-                        age INTEGER,
-                        location TEXT,
-                        school TEXT,
-                        points INTEGER NOT NULL"""
+                                        "points": row[8]})
 
 
 def populateQuestionStats():

@@ -130,5 +130,6 @@ SELECT * FROM friends
 JOIN users ON users.user_key = friends.user_key
 WHERE friend_key = 3;
 
+-- See all questions your friends has done (w/t question info)
 
 
