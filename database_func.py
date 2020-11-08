@@ -16,13 +16,18 @@ def login(username, password):
     password = input("Enter the password: ")
 
     return db.execute("SELECT * FROM users WHERE user_name = :uname AND password = :pass LIMIT 1")
-    #query here
 
 def signup(info):
-    uname = input("Enter the username: ")
-    password = input("Enter the password: ")
-
-    #query here
+    db.execute("""INSERT INTO users(user_name, email, password, first_name, last_name, age, location, school) 
+                    VALUES(:uname, :email, :password, :f_name, :l_name, :age, :loc, :school)""", {
+                            "uname": info[0],
+                            "email": info[1],
+                            "password": info[2],
+                            "f_name": info[3],
+                            "l_name": info[4],
+                            "age": info[5],
+                            "loc": info[6],
+                            "school": info[7]})
 
 def add_friend(userkey, friendkey):
     pass
@@ -244,43 +249,54 @@ def question_prompt():
         elif choice == '4':
             get_questions_from_user()
 
+##Helper function for signup
+def checkForNone(value):
+    if value == '':
+        return None
+    else:
+        return value
+
 def login_prompt():
-    choice = ''
-    while choice != 'q':
-        print("####################################")
-        os.system('clear')
+    print("####################################")
+    os.system('clear')
 
-        uname = input("Enter in your username: ")
-        password = input("Enter in your password:")
+    uname = input("Enter in your username: ")
+    password = input("Enter in your password:")
 
-        result = login(uname, password)
+    result = login(uname, password)
+
+    if result.rowcount() == 1:
+        print("Successively logged in.")
+    else:
+        print("Error logging in.")
+
+    input("Press Enter to continue...")
 
 def signup_prompt():
-    choice = ''
-    while choice != 'q':
-        print("####################################")
-        os.system('clear')
+    print("####################################")
+    os.system('clear')
 
-        info = []
-        info.append(input("Enter in your username: "))
-        info.append(input("Enter in your email: "))
-        info.append(input("Enter in your password: "))
+    info = []
+    info.append(input("Enter in your username: "))
+    info.append(input("Enter in your email: "))
+    info.append(input("Enter in your password: "))
 
-        print("\n####################################")
-        print("The following questions are optional.")
+    print("\n####################################")
+    print("The following questions are optional.")
 
-        info.append(input("First Name: "))
-        info.append(input("Last Name: "))
-        info.append(int(input("Age: ")))
-        info.append(input("Location: "))
-        info.append(input("School: "))
+    info.append(checkForNone(input("First Name: ")))
+    info.append(checkForNone(input("Last Name: ")))
+    info.append(checkForNone(input("Age: ")))
+    info.append(checkForNone(input("Location: ")))
+    info.append(checkForNone(input("School: ")))
 
-        signup(info)
+    signup(info)
 
-        input("Thanks for signing up! Press Enter to continue...")
+    input("Thanks for signing up! Press Enter to continue...")
 
 def delete_user_prompt():
     users = db.execute("SELECT * FROM users")
+    pass
 
 def user_prompt():
     choice = ''
@@ -433,14 +449,14 @@ Welcome to.....
         user_prompt()
     elif choice == '4':
         friend_prompt()
-    elif choice == '9':
+    elif choice == '.':
         os.system('clear')
         query = input()
         res = db.execute(query)
-        for row in res:
-            print(row)
+        # for row in res:
+        #     print(row)
         db.commit()
-        input()
+        input("Press enter to continue...")
 
     print("####################################")
     os.system('clear')

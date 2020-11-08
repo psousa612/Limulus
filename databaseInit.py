@@ -22,7 +22,7 @@ def database_init():
                         age INTEGER,
                         location TEXT,
                         school TEXT,
-                        points INTEGER NOT NULL);""")
+                        points INTEGER NOT NULL DEFAULT 0);""")
 
         db.execute("""CREATE TABLE IF NOT EXISTS questions (
                         question_key SERIAL PRIMARY KEY,
@@ -65,8 +65,8 @@ def database_init():
         # populateTable("https://opentdb.com/api.php?amount=30&category=30&type=multiple")
         # populateTable("https://opentdb.com/api.php?amount=30&category=15&type=multiple")
 
-        # populateUsers()
-        populateFriends()
+        populateUsers()
+        # populateFriends()
 
         db.commit()
 
@@ -85,9 +85,9 @@ def populateTable(url):
         db.commit()
 
 def populateUsers():
-        users = [["ySharma", "yash@yash.com", "abc123", "Yash", "Sharma", 18, None, "UCMerced", 0],
-                ["bbridi", "bbbbbbbbridi@protonmail.com", "securePassword99", "Busher", None, 29, None, "UCMerced", 0],
-                ["psousa", "spam@gmail.com", "theseWillBeHashedEventually", None, "Sousa", 21, "San Jose", "UCMerced", 0]]
+        users = [["ySharma", "yash@yash.com", "abc123", "Yash", "Sharma", 18, None, "UCMerced", 600],
+                ["bbridi", "bbbbbbbbridi@protonmail.com", "securePassword99", "Busher", None, 29, None, "UCMerced", 504],
+                ["psousa", "spam@gmail.com", "theseWillBeHashedEventually", None, "Sousa", 21, "San Jose", "UCMerced", 339]]
         
         for row in users:
                 db.execute("""INSERT INTO users(user_name, email, password, first_name, last_name, age, location, school, points) 
