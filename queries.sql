@@ -111,7 +111,6 @@ SELECT * FROM questions
 NATURAL JOIN question_stats
 ORDER BY random()
 LIMIT 1;
-
     
 
 -- Getting a list of friends

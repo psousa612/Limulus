@@ -2,6 +2,7 @@ import os
 from sqlalchemy import create_engine, exc
 from sqlalchemy.orm import scoped_session, sessionmaker
 import requests
+import random
 ##DB Init Functions
 
 if not os.getenv("DATABASE_URL"):
@@ -51,7 +52,7 @@ def database_init():
                 friend_key INTEGER NOT NULL);""")
 
         db.execute("""CREATE TABLE IF NOT EXISTS question_history (
-                user_key INTEGER PRIMARY KEY,
+                user_key INTEGER NOT NULL,
                 question_key INTEGER NOT NULL,
                 date DATE);""")
 
@@ -60,17 +61,20 @@ def database_init():
         #Science: Gadget: https://opentdb.com/api.php?amount=10&category=30&type=multiple
         #Video Games:  https://opentdb.com/api.php?amount=10&category=15&type=multiple
 
-        # populateTable("https://opentdb.com/api.php?amount=30&category=18&type=multiple")
-        # populateTable("https://opentdb.com/api.php?amount=30&category=19&type=multiple")
-        # populateTable("https://opentdb.com/api.php?amount=30&category=30&type=multiple")
-        # populateTable("https://opentdb.com/api.php?amount=30&category=15&type=multiple")
+        populateQuestions("https://opentdb.com/api.php?amount=30&category=18&type=multiple")
+        populateQuestions("https://opentdb.com/api.php?amount=30&category=19&type=multiple")
+        populateQuestions("https://opentdb.com/api.php?amount=30&category=30&type=multiple")
+        populateQuestions("https://opentdb.com/api.php?amount=30&category=15&type=multiple")
 
         populateUsers()
-        # populateFriends()
+        populateFriends()
+        populateQuestionStats()
+        populateLeaderboard()
+        populateQuestionHistory()
 
         db.commit()
 
-def populateTable(url):
+def populateQuestions(url):
         #Insert questions from Open Trivia DB
         response = requests.get(url)
         results = response.json()["results"]
@@ -113,6 +117,47 @@ def populateFriends():
         db.commit()
 
 def populateQuestionStats():
-        print("question stats")
+        res = db.execute("SELECT question_key FROM questions")
+        qkeys = []
+        for row in res:
+                qkeys.append(row[0])
+
+        for key in qkeys:
+                total = random.randint(0, 50)
+                correct = random.randint(0, total)
+                first = random.randint(0, correct)
+
+                db.execute("INSERT INTO question_stats VALUES(:key, :total, :correct, :first)", {
+                        "key": key,
+                        "total": total,
+                        "correct": correct,
+                        "first": first })
+        
+        db.commit()
+
+def populateLeaderboard():
+        db.execute("DELETE FROM leaderboard")
+    
+        result = db.execute("SELECT user_key, points FROM users ORDER BY points")
+
+        for row in result:
+                db.execute("""INSERT INTO leaderboard(user_key, points)
+                                VALUES(:user_key, :points)""", {"user_key":row[0], "points":row[1]})
+
+def populateQuestionHistory():
+        keys = db.execute("SELECT user_key FROM users")
+        maxQuestionKey = db.execute("SELECT MAX(question_key) FROM questions")
+        
+        for row in maxQuestionKey:
+                maxKey = row[0]
+
+        for ukey in keys:
+                for i in range(0, random.randint(0, 10)):
+                        
+                        db.execute("INSERT INTO question_history(user_key, question_key) VALUES(:ukey, :qkey)", {
+                                "ukey": ukey[0],
+                                "qkey": random.randint(0, maxKey)
+                        })
+        db.commit()
 
 database_init()

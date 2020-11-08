@@ -6,16 +6,11 @@ import hashlib
 import requests
 import random
 
-
 #Function Definitions
-
 
 ##User Functions
 def login(username, password):
-    uname = input("Enter the username: ")
-    password = input("Enter the password: ")
-
-    return db.execute("SELECT * FROM users WHERE user_name = :uname AND password = :pass LIMIT 1")
+    return db.execute("SELECT * FROM users WHERE user_name = :uname AND password = :pass LIMIT 1", {"uname":username, "password":password})
 
 def signup(info):
     db.execute("""INSERT INTO users(user_name, email, password, first_name, last_name, age, location, school) 
@@ -28,6 +23,8 @@ def signup(info):
                             "age": info[5],
                             "loc": info[6],
                             "school": info[7]})
+
+    db.commit()
 
 def add_friend(userkey, friendkey):
     pass
@@ -64,8 +61,14 @@ def get_username(userkey):
     for row in res:
         return row[0]
 
+def get_points(userkey):
+    res = db.execute("SELECT points FROM users WHERE user_key = :ukey", {"ukey":userkey})
+    for row in res:
+        return row[0]
+
 def update_points(ukey):
     db.execute("UPDATE users SET points = points + 1 WHERE user_key = :ukey", {"ukey":ukey})
+    db.commit()
 
 ##Leaderboard functions
 def refresh_leaderboard():
@@ -76,6 +79,8 @@ def refresh_leaderboard():
     for row in result:
         db.execute("""INSERT INTO leaderboard(user_key, points)
                         VALUES(:user_key, :points)""", {"user_key":row[0], "points":row[1]})
+
+    db.commit()
 
 def fetch_top10():
     return db.execute("SELECT ROW_NUMBER() OVER (ORDER BY points), * FROM leaderboard ORDER BY points")
@@ -102,12 +107,14 @@ def update_question_stats_wrong(q_key):
     db.execute("""UPDATE question_stats 
                     SET total_amt = total_amt + 1 
                     WHERE question_key = :q_key""", {"q_key":q_key})
+    db.commit()
 
 def update_question_stats_correct(q_key):
     db.execute("""UPDATE question_stats 
                     SET total_amt = total_amt + 1,
                         total_correct = total_correct + 1 
                     WHERE question_key = :q_key""", {"q_key":q_key})
+    db.commit()
 
 def update_question_stats_correct_first_try(q_key):
     db.execute("""UPDATE question_stats 
@@ -115,6 +122,8 @@ def update_question_stats_correct_first_try(q_key):
                         total_correct = total_correct + 1,
                         total_first_ty_correct = total_first_ty_correct + 1
                     WHERE question_key = :q_key""", {"q_key":q_key})
+    db.commit()
+    
 def delete_user(user_key):
     db.execute("DELETE users WHERE user_key=:user_key",{"user_key":int(user_key)})
     db.commit()
@@ -127,6 +136,7 @@ def get_top_ten_school():
 
 def get_toughest_question():
     return db.execute("SELECT question_key FROM question_stats WHERE total_amt != 0 ORDER BY total_first_try_correct ASC LIMIT 1")
+
 def insert_question(question):
     db.execute("""INSERT INTO questions(category, prompt, correct, wrong1, wrong2, wrong3, author_key)
                     VALUES(:cat, :prompt, :correct, :wrong1, :wrong2, :wrong3, :auth_key)""", {
@@ -139,6 +149,7 @@ def insert_question(question):
                         "auth_key":question[6]
                     });
     db.commit()
+
 def get_questions_from_user():
     print("####################################")
     os.system('clear')
@@ -163,6 +174,14 @@ def get_questions_from_user():
         print("Cancelling...")
         input("Press Enter to continue...")
 
+def get_question_history(ukey):
+    return db.execute("SELECT * FROM question_history WHERE user_key = :ukey", {"ukey":ukey})
+
+def get_question_history_with_info(ukey):
+    return db.execute("""SELECT question_history.question_key, prompt FROM question_history 
+                            JOIN questions ON questions.question_key = question_history.question_key
+                            JOIN users ON users.user_key = question_history.user_key
+                            WHERE users.user_key = :ukey""", {"ukey":ukey})
 
 
 ##Prompts
@@ -244,6 +263,7 @@ def question_prompt():
         print("[2] Random Question")
         print("[3] Question From Specific Category")
         print("[4] Submit A New Question")
+        print("[5] View A User's Question History")
         print("[q] Go Back")
         
         choice = input("Enter in your selection: ")
@@ -259,8 +279,18 @@ def question_prompt():
             quiz_prompt(random_question_with_category(category_prompt()))
         elif choice == '4':
             get_questions_from_user()
+        elif choice == '5':
+            ukey = userkey_prompt()
+            res = get_question_history_with_info(ukey)
+            os.system('clear')
+            print("{}'s Question History".format(get_username(ukey)))
+            for row in res:
+                print("{}: {}".format(row[0], row[1]))
 
-##Helper function for signup
+            input("Press Enter to continue...")
+
+
+
 def checkForNone(value):
     if value == '':
         return None
@@ -318,6 +348,7 @@ def user_prompt():
         print("[1] Log In")
         print("[2] Sign Up")
         print("[3] Delete User")
+        print("[4] Add Points To User")
         print("[q] Go Back")
 
         choice = input("Enter in your selection: ")
@@ -326,11 +357,17 @@ def user_prompt():
         elif choice == '2':
             signup_prompt()
         elif choice == '3':
-            pass
+            delete_user_prompt()
+        elif choice == '4':
+            ukey = userkey_prompt()
+            update_points(ukey)
+            print("{} now has {} points.".format(get_username(ukey), get_points(ukey)))
+            input("Press Enter to continue...")
 
 def userkey_prompt():
-    users = db.execute("""SELECT user_key, user_name FROM users""")
+    users = db.execute("""SELECT user_key, user_name FROM users ORDER BY user_key ASC""")
 
+    print("----------------------")
     print("User List:")
     for row in users:
         print("[{}] {}".format(row[0], row[1]))
@@ -347,6 +384,7 @@ def friend_prompt():
         print("[1] View Friends")
         print("[2] Add Friend")
         print("[3] Remove Friend")
+        
 
         print("[q] Go Back")
 
@@ -368,6 +406,14 @@ def friend_prompt():
         elif choice == '3':
             pass
 
+def leaderboard_prompt():
+    choice = ''
+    while choice != 'q':
+        print("####################################")
+        os.system('clear')
+
+        print("[1] View Top 10 Players")
+        print("[2] ")
 
 ##Misc Functions
 def print_table(table_name):
@@ -447,6 +493,7 @@ Welcome to.....
     print("[2] Questions")
     print("[3] Users")
     print("[4] Friends")
+    print("[5] Leaderboard")
 
     print("[q] quit")
 
@@ -460,13 +507,17 @@ Welcome to.....
         user_prompt()
     elif choice == '4':
         friend_prompt()
+    elif choice == '5':
+        leaderboard_prompt()
     elif choice == '.':
         os.system('clear')
-        query = input()
-        res = db.execute(query)
-        # for row in res:
-        #     print(row)
-        db.commit()
+        try:
+            query = input()
+            db.execute(query)
+            db.commit()
+        except Exception as e:
+            print("Error! {}".format(e))
+
         input("Press enter to continue...")
 
     print("####################################")
