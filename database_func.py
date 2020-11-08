@@ -122,7 +122,11 @@ def delete_user(user_key):
 def get_top_peer(user_key):
     return db.execute("SELECT * FROM users WHERE school = (SELECT school FROM users WHERE user_key=:user_key) ORDER BY points DESC LIMIT 1",{"user_key":int(user_key)})
 
+def get_top_ten_school():
+    return db.execute("SELECT school FROM users GROUP BY school ORDER BY SUM(points) LIMIT 10")
 
+def get_toughest_question():
+    return db.execute("SELECT question_key FROM question_stats WHERE total_amt != 0 ORDER BY total_first_try_correct ASC LIMIT 1")
 def insert_question(question):
     db.execute("""INSERT INTO questions(category, prompt, correct, wrong1, wrong2, wrong3, author_key)
                     VALUES(:cat, :prompt, :correct, :wrong1, :wrong2, :wrong3, :auth_key)""", {
