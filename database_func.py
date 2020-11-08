@@ -115,6 +115,13 @@ def update_question_stats_correct_first_try(q_key):
                         total_correct = total_correct + 1,
                         total_first_ty_correct = total_first_ty_correct + 1
                     WHERE question_key = :q_key""", {"q_key":q_key})
+def delete_user(user_key):
+    db.execute("DELETE users WHERE user_key=:user_key",{"user_key":int(user_key)})
+    db.commit()
+    
+def get_top_peer(user_key):
+    return db.execute("SELECT * FROM users WHERE school = (SELECT school FROM users WHERE user_key=:user_key) ORDER BY points DESC LIMIT 1",{"user_key":int(user_key)})
+
 
 def insert_question(question):
     db.execute("""INSERT INTO questions(category, prompt, correct, wrong1, wrong2, wrong3, author_key)
@@ -127,7 +134,7 @@ def insert_question(question):
                         "wrong3":question[5],
                         "auth_key":question[6]
                     });
-
+    db.commit()
 def get_questions_from_user():
     print("####################################")
     os.system('clear')
