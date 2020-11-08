@@ -28,16 +28,16 @@ def add_friend(userkey, friendkey):
     pass
 
 def get_friends(userkey):
-    db.execute("""SELECT friend_key FROM friends
+    return db.execute("""SELECT friend_key FROM friends
                     WHERE user_key = :ukey
                     UNION
                     SELECT user_key FROM friends
                     WHERE friend_key = :ukey;""", {"ukey":userkey})
 
 def get_friends_with_info(userkey):
-    db.execute("""SELECT * FROM friends
+    return db.execute("""SELECT * FROM friends
                     JOIN users ON users.user_key = friends.friend_key
-                    WHERE friends.user_key = :ukey
+                    WHERE users.user_key = :ukey
                     UNION
                     SELECT * FROM friends
                     JOIN users ON users.user_key = friends.user_key
@@ -45,13 +45,19 @@ def get_friends_with_info(userkey):
 
 ##Do not include this one in our total query count :3
 def get_friends_with_name(userkey):
-        db.execute("""SELECT user_name FROM friends
+    return db.execute("""SELECT user_name FROM friends
                     JOIN users ON users.user_key = friends.friend_key
                     WHERE friends.user_key = :ukey
                     UNION
                     SELECT user_name FROM friends
                     JOIN users ON users.user_key = friends.user_key
                     WHERE friend_key = :ukey;""", {"ukey":userkey})
+
+##Or this one
+def get_username(userkey):
+    res = db.execute("SELECT user_name FROM users WHERE user_key = :ukey", {"ukey":userkey})
+    for row in res:
+        return row[0]
 
 def update_points(ukey):
     db.execute("UPDATE users SET points = points + 1 WHERE user_key = :ukey", {"ukey":ukey})
@@ -296,7 +302,14 @@ def user_prompt():
             pass
 
 def userkey_prompt():
-    pass
+    users = db.execute("""SELECT user_key, user_name FROM users""")
+
+    print("User List:")
+    for row in users:
+        print("[{}] {}".format(row[0], row[1]))
+
+
+    return(int(input("\nEnter in which user: ")))
 
 def friend_prompt():
     choice = ''
@@ -306,12 +319,27 @@ def friend_prompt():
 
         print("[1] View Friends")
         print("[2] Add Friend")
+        print("[3] Remove Friend")
 
+        print("[q] Go Back")
+
+        choice = input("Enter in your selection: ")
+        
         os.system('clear')
-
         if choice == '1':
+            userkey = userkey_prompt()
+            username = get_username(userkey)
+            res = get_friends_with_name(userkey)
+            for row in res:
+                print("{} is friends with {}".format(username, row[0]))
+
+            input("Press Enter to continue...")
+
+        elif choice == '2':
             pass
 
+        elif choice == '3':
+            pass
 
 
 ##Misc Functions
@@ -408,7 +436,11 @@ Welcome to.....
     elif choice == '9':
         os.system('clear')
         query = input()
-        db.execute(query)
+        res = db.execute(query)
+        for row in res:
+            print(row)
+        db.commit()
+        input()
 
     print("####################################")
     os.system('clear')

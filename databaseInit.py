@@ -65,8 +65,8 @@ def database_init():
         # populateTable("https://opentdb.com/api.php?amount=30&category=30&type=multiple")
         # populateTable("https://opentdb.com/api.php?amount=30&category=15&type=multiple")
 
-        populateUsers()
-        # populateFriends()
+        # populateUsers()
+        populateFriends()
 
         db.commit()
 
@@ -103,8 +103,14 @@ def populateUsers():
                                         "points": row[8]})
 
 def populateFriends():
-        friends = []
+        friends = [[1, 2], 
+                   [3, 1],
+                   [3, 2]]
 
+        for row in friends:
+                db.execute("""INSERT INTO friends(user_key, friend_key)
+                                VALUES(:ukey, :fkey)""", {"ukey":row[0], "fkey":row[1]})
+        db.commit()
 
 def populateQuestionStats():
         print("question stats")
