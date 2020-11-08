@@ -24,8 +24,37 @@ def signup(info):
 
     #query here
 
-def update_points(uname):
+def add_friend(userkey, friendkey):
     pass
+
+def get_friends(userkey):
+    db.execute("""SELECT friend_key FROM friends
+                    WHERE user_key = :ukey
+                    UNION
+                    SELECT user_key FROM friends
+                    WHERE friend_key = :ukey;""", {"ukey":userkey})
+
+def get_friends_with_info(userkey):
+    db.execute("""SELECT * FROM friends
+                    JOIN users ON users.user_key = friends.friend_key
+                    WHERE friends.user_key = :ukey
+                    UNION
+                    SELECT * FROM friends
+                    JOIN users ON users.user_key = friends.user_key
+                    WHERE friend_key = :ukey;""", {"ukey":userkey})
+
+##Do not include this one in our total query count :3
+def get_friends_with_name(userkey):
+        db.execute("""SELECT user_name FROM friends
+                    JOIN users ON users.user_key = friends.friend_key
+                    WHERE friends.user_key = :ukey
+                    UNION
+                    SELECT user_name FROM friends
+                    JOIN users ON users.user_key = friends.user_key
+                    WHERE friend_key = :ukey;""", {"ukey":userkey})
+
+def update_points(ukey):
+    db.execute("UPDATE users SET points = points + 1 WHERE user_key = :ukey", {"ukey":ukey})
 
 ##Leaderboard functions
 def refresh_leaderboard():
@@ -244,6 +273,9 @@ def signup_prompt():
 
         input("Thanks for signing up! Press Enter to continue...")
 
+def delete_user_prompt():
+    users = db.execute("SELECT * FROM users")
+
 def user_prompt():
     choice = ''
     while choice != 'q':
@@ -252,6 +284,7 @@ def user_prompt():
 
         print("[1] Log In")
         print("[2] Sign Up")
+        print("[3] Delete User")
         print("[q] Go Back")
 
         choice = input("Enter in your selection: ")
@@ -259,6 +292,25 @@ def user_prompt():
             login_prompt()
         elif choice == '2':
             signup_prompt()
+        elif choice == '3':
+            pass
+
+def userkey_prompt():
+    pass
+
+def friend_prompt():
+    choice = ''
+    while choice != 'q':
+        print("####################################")
+        os.system('clear')
+
+        print("[1] View Friends")
+        print("[2] Add Friend")
+
+        os.system('clear')
+
+        if choice == '1':
+            pass
 
 
 
@@ -275,7 +327,6 @@ def view_tables():
     while choice != 'q':
         print("####################################")
         os.system('clear')
-        
 
         print("[1] Users")
         print("[2] Friends")
@@ -340,7 +391,7 @@ Welcome to.....
     print("[1] View tables")
     print("[2] Questions")
     print("[3] Users")
-    # print("[4] ")
+    print("[4] Friends")
 
     print("[q] quit")
 
@@ -352,11 +403,12 @@ Welcome to.....
         question_prompt()
     elif choice == '3':
         user_prompt()
+    elif choice == '4':
+        friend_prompt()
     elif choice == '9':
-        res = random_question_with_stats()
-        for row in res:
-            print(row)
-        input("reeee")
+        os.system('clear')
+        query = input()
+        db.execute(query)
 
     print("####################################")
     os.system('clear')

@@ -65,7 +65,9 @@ def database_init():
         # populateTable("https://opentdb.com/api.php?amount=30&category=30&type=multiple")
         # populateTable("https://opentdb.com/api.php?amount=30&category=15&type=multiple")
 
-        # populateUsers()
+        populateUsers()
+        # populateFriends()
+
         db.commit()
 
 def populateTable(url):
@@ -99,6 +101,9 @@ def populateUsers():
                                         "loc": row[6],
                                         "school": row[7],
                                         "points": row[8]})
+
+def populateFriends():
+        friends = []
 
 
 def populateQuestionStats():
