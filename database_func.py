@@ -82,7 +82,6 @@ def update_points(ukey):
 ##Leaderboard functions
 def refresh_leaderboard():
     db.execute("DELETE FROM leaderboard")
-    
     result = db.execute("SELECT user_key, points FROM users ORDER BY points")
 
     for row in result:
@@ -92,7 +91,7 @@ def refresh_leaderboard():
     db.commit()
 
 def fetch_top10():
-    return db.execute("SELECT ROW_NUMBER() OVER (ORDER BY points), * FROM leaderboard ORDER BY points")
+    return db.execute("SELECT ROW_NUMBER() OVER (ORDER BY points DESC), * FROM leaderboard ORDER BY points DESC")
 
 ##Question functions
 def get_categories():
@@ -150,7 +149,7 @@ def delete_user(user_key):
     db.commit()
     
 def get_top_peer(user_key):
-    return db.execute("SELECT * FROM users WHERE school = (SELECT school FROM users WHERE user_key=:user_key) ORDER BY points DESC LIMIT 1",{"user_key":int(user_key)})
+    return db.execute("SELECT ROW_NUMBER() OVER (ORDER BY points), * FROM users WHERE school = (SELECT school FROM users WHERE user_key=:user_key) ORDER BY points DESC LIMIT 1",{"user_key":int(user_key)})
 
 def get_top_ten_school():
     return db.execute("SELECT school FROM users GROUP BY school ORDER BY SUM(points) LIMIT 10")
@@ -311,7 +310,6 @@ def question_prompt():
             input("Press Enter to continue...")
 
 
-
 def checkForNone(value):
     if value == '':
         return None
@@ -453,8 +451,30 @@ def leaderboard_prompt():
         print("####################################")
         os.system('clear')
 
-        print("[1] View Top 10 Players")
-        print("[2] ")
+        print("[1] View Leaderboard")
+        print("[2] View Top 10 Players")
+
+        print("[q] Go Back")
+
+        choice = input("Enter in your selection: ")
+        if choice == '1':
+            refresh_leaderboard()
+            os.system('clear')
+            print("{:>8s} | {:<10s}".format("Ranking", "Name"))
+            for row in fetch_top10():
+                print("{:>8} | {:<10s}".format(row[0], get_username(row[1])))
+            
+            input("Press Enter to continue...")
+
+        elif choice == '2':
+            ukey = userkey_prompt()
+            os.system('clear')
+
+            print("{:>8s} | {:<10s}".format("Ranking", "Name"))
+            for row in get_top_peer(ukey):
+                print("{:>8} | {:<10s}".format(row[0], row[2]))
+
+            input("Press Enter to continue...")
 
 ##Misc Functions
 def print_table(table_name):
@@ -535,8 +555,9 @@ Welcome to.....
     print("[3] Users")
     print("[4] Friends")
     print("[5] Leaderboard")
+    print("[6] Misc/Stats")
 
-    print("[q] quit")
+    print("[q] Quit")
 
     choice = input("Select an option: ")
 
