@@ -104,7 +104,7 @@ def random_question_with_category(category):
     return db.execute("SELECT * FROM questions WHERE category = :cat ORDER BY RANDOM() LIMIT 1", {"cat":category})
 
 def get_question_stats(q_key):
-    return db.execute("SELECT * FROM question_stats WHERE question_key = :q_key", {"q_key":q_key})
+    return db.execute("SELECT * FROM question_stats WHERE question_key = :q_key", {"q_key":q_key}).fetchone()
 
 def random_question_with_stats():
     return db.execute("""SELECT * FROM questions 
@@ -149,13 +149,16 @@ def delete_user(user_key):
     db.commit()
     
 def get_top_peer(user_key):
-    return db.execute("SELECT ROW_NUMBER() OVER (ORDER BY points), * FROM users WHERE school = (SELECT school FROM users WHERE user_key=:user_key) ORDER BY points DESC LIMIT 1",{"user_key":int(user_key)})
+    return db.execute("SELECT * FROM users WHERE school = (SELECT school FROM users WHERE user_key=:user_key) ORDER BY points DESC LIMIT 1",{"user_key":int(user_key)}).fetchone()
 
 def get_top_ten_school():
-    return db.execute("SELECT school FROM users GROUP BY school ORDER BY SUM(points) LIMIT 10")
+    return db.execute("SELECT ROW_NUMBER() OVER (ORDER BY SUM(points)), school FROM users GROUP BY school ORDER BY SUM(points) LIMIT 10")
 
 def get_toughest_question():
-    return db.execute("SELECT question_key FROM question_stats WHERE total_amt != 0 ORDER BY total_first_try_correct ASC LIMIT 1")
+    return db.execute("SELECT question_key FROM question_stats WHERE total_amt != 0 ORDER BY total_first_try_correct ASC LIMIT 1").fetchone()
+
+def get_question(q_key):
+    return db.execute("SELECT * FROM questions WHERE question_key = :qkey", {"qkey":q_key}).fetchone()
 
 def insert_question(question):
     db.execute("""INSERT INTO questions(category, prompt, correct, wrong1, wrong2, wrong3, author_key)
@@ -453,6 +456,9 @@ def leaderboard_prompt():
 
         print("[1] View Leaderboard")
         print("[2] View Top 10 Players")
+        print("[3] Get Top Peer")
+        print("[4] Get Top 10 Schools")
+        print("[5] Get Toughest Question")
 
         print("[q] Go Back")
 
@@ -465,16 +471,99 @@ def leaderboard_prompt():
                 print("{:>8} | {:<10s}".format(row[0], get_username(row[1])))
             
             input("Press Enter to continue...")
-
         elif choice == '2':
             ukey = userkey_prompt()
             os.system('clear')
 
+            print("The toughest question is: ")
             print("{:>8s} | {:<10s}".format("Ranking", "Name"))
             for row in get_top_peer(ukey):
                 print("{:>8} | {:<10s}".format(row[0], row[2]))
 
             input("Press Enter to continue...")
+        elif choice == '3':
+            ukey = userkey_prompt()
+            res = get_top_peer(ukey)
+            os.system('clear')
+
+            print("{}'s top peer is {}.".format(get_username(ukey), res[1]))
+            input("\nPress Enter to continue...")
+        elif choice == '4':
+            os.system('clear')
+
+            print("{:>8s} | {:<8s}".format("Ranking", "School"))
+            for row in get_top_ten_school():
+                print("{:>8} | {:<8s}".format(row[0], row[1]))
+
+            input("Press Enter to continue...")
+        elif choice == '5':
+            os.system('clear')
+
+            res = get_toughest_question()
+            for row in res:
+                qkey = row
+            question = get_question(qkey)
+            stats = get_question_stats(qkey)
+
+            print("{} | {}  \nTotal Answers: {} \nTotal Wrong: {}".format(question[1], question[2], stats[1], stats[1]-stats[2]))
+            input("Press Enter to continue...")
+
+def question_stats_prompt():
+    choice = ''
+    while choice != 'q':
+        print("####################################")
+        os.system('clear')
+
+        print("[1] View A Questions Stats")
+        print("[2] Increment A Question's Stats Entry")
+
+        print("[q] Go Back")
+
+        choice = input("Please enter in a selection: ")
+
+        if choice == '1':
+            qkey = input("Please enter the question key: ")
+            os.system('clear')
+            try:
+                print("{:13} | {:20} | {:20} | {:20}".format("Question Key", "Amount of Responses", "Total Correct", "Total First Tries"))
+                res = get_question_stats(qkey)
+                print("{:<13} | {:<20} | {:<20} | {:<20}".format(res[0], res[1], res[2], res[3]))
+                input("Press Enter to continue...")
+            except Exception as e:
+                input("Invalid input! Press Enter to continue...")
+        elif choice == '2':
+            qkey = input("Please enter the question key: ")
+            os.system('clear')
+            try:
+                print("Current Question Stats:")
+                res = get_question_stats(qkey)
+                print("{:13} | {:20} | {:20} | {:20}".format("Question Key", "Amount of Responses", "Total Correct", "Total First Tries"))
+                print("{:<13} | {:<20} | {:<20} | {:<20}".format(res[0], res[1], res[2], res[3]))
+                print("------------------------")
+
+                print("[1] Correct Answer")
+                print("[2] Correct Answer, First Try")
+                print("[3] Wrong Answer")
+
+                opt = input("Please enter a selection: ")
+
+                if opt == '1':
+                    update_question_stats_correct(qkey)
+                elif opt == '2':
+                    update_question_stats_correct(qkey)
+                elif opt == '3':
+                    update_question_stats_wrong(qkey)
+
+                print("------------------------")
+                res = get_question_stats(qkey)
+                print("{:13} | {:20} | {:20} | {:20}".format("Question Key", "Amount of Responses", "Total Correct", "Total First Tries"))
+                print("{:<13} | {:<20} | {:<20} | {:<20}".format(res[0], res[1], res[2], res[3]))
+
+            except Exception as e:
+                print("Something went wrong! :(")
+            input("Press Enter to continue...")
+            
+
 
 ##Misc Functions
 def print_table(table_name):
@@ -537,8 +626,6 @@ db = scoped_session(sessionmaker(bind=engine))
 os.system('clear')
 
 choice = ''
-user_key = -1;
-
 while choice != 'q':
     print("##########################################")
     print("""
@@ -555,7 +642,7 @@ Welcome to.....
     print("[3] Users")
     print("[4] Friends")
     print("[5] Leaderboard")
-    print("[6] Misc/Stats")
+    print("[6] Question Stats")
 
     print("[q] Quit")
 
@@ -571,6 +658,8 @@ Welcome to.....
         friend_prompt()
     elif choice == '5':
         leaderboard_prompt()
+    elif choice == '6':
+        question_stats_prompt()
     elif choice == '.':
         os.system('clear')
         try:
