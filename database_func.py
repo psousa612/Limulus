@@ -134,7 +134,19 @@ def update_question_stats_correct_first_try(q_key):
     db.commit()
     
 def delete_user(user_key):
-    db.execute("DELETE users WHERE user_key=:user_key",{"user_key":int(user_key)})
+    #To completly remove a user, we need to remove them from:
+
+    #the users table
+    db.execute("DELETE FROM users WHERE user_key=:user_key",{"user_key":int(user_key)})
+
+    #the friends table
+    db.execute("DELETE FROM friends WHERE user_key=:user_key OR friend_key=:user_key",{"user_key":int(user_key)})
+    
+    #the question history table
+    db.execute("DELETE FROM question_history WHERE user_key=:user_key",{"user_key":int(user_key)})
+    
+    #and the leaderboard table
+    db.execute("DELETE FROM leaderboard WHERE user_key=:user_key",{"user_key":int(user_key)})
     db.commit()
     
 def get_top_peer(user_key):
@@ -344,10 +356,6 @@ def signup_prompt():
 
     input("Thanks for signing up! Press Enter to continue...")
 
-def delete_user_prompt():
-    users = db.execute("SELECT * FROM users")
-    pass
-
 def user_prompt():
     choice = ''
     while choice != 'q':
@@ -366,7 +374,11 @@ def user_prompt():
         elif choice == '2':
             signup_prompt()
         elif choice == '3':
-            delete_user_prompt()
+            ukey = userkey_prompt()
+            uname = get_username(ukey)
+            delete_user(ukey)
+            print("{} has successfully been deleted!".format(uname))
+            input("Press Enter to continue...")
         elif choice == '4':
             ukey = userkey_prompt()
             update_points(ukey)
