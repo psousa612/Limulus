@@ -27,7 +27,8 @@ def signup(info):
     db.commit()
 
 def add_friend(userkey, friendkey):
-    pass
+    db.execute("INSERT INTO friends(user_key, friend_key) VALUES(:ukey, :fkey)", {"ukey":userkey, "fkey":friendkey})
+    db.commit()
 
 def get_friends(userkey):
     return db.execute("""SELECT friend_key FROM friends
@@ -45,7 +46,6 @@ def get_friends_with_info(userkey):
                     JOIN users ON users.user_key = friends.user_key
                     WHERE friend_key = :ukey;""", {"ukey":userkey})
 
-##Do not include this one in our total query count :3
 def get_friends_with_name(userkey):
     return db.execute("""SELECT user_name FROM friends
                     JOIN users ON users.user_key = friends.friend_key
@@ -55,9 +55,18 @@ def get_friends_with_name(userkey):
                     JOIN users ON users.user_key = friends.user_key
                     WHERE friend_key = :ukey;""", {"ukey":userkey})
 
-##Or this one
+def remove_friend(ukey, fkey):
+    db.execute("""DELETE FROM friends WHERE (user_key = :ukey AND friend_key = :fkey) 
+                    OR (user_key = :fkey AND friend_key = :ukey)""", {"ukey":ukey, "fkey":fkey})
+    db.commit()
+
 def get_username(userkey):
     res = db.execute("SELECT user_name FROM users WHERE user_key = :ukey", {"ukey":userkey})
+    for row in res:
+        return row[0]
+
+def get_userkey(username):
+    res = db.execute("SELECT user_key FROM users WHERE user_name = :uname", {"uname":username})
     for row in res:
         return row[0]
 
@@ -384,8 +393,6 @@ def friend_prompt():
         print("[1] View Friends")
         print("[2] Add Friend")
         print("[3] Remove Friend")
-        
-
         print("[q] Go Back")
 
         choice = input("Enter in your selection: ")
@@ -399,12 +406,34 @@ def friend_prompt():
                 print("{} is friends with {}".format(username, row[0]))
 
             input("Press Enter to continue...")
-
         elif choice == '2':
-            pass
+            print("First userkey:")
+            ukey = userkey_prompt()
+            print("Second userkey: ")
+            fkey = userkey_prompt()
 
+            add_friend(ukey, fkey)
+            print("Success! {} and {} are now friends!".format(get_username(ukey), get_username(fkey)))
+            input("Press Enter to continue...")
         elif choice == '3':
-            pass
+            print("Select user to delete a friend from")
+            ukey = userkey_prompt()
+            res = get_friends_with_name(ukey)
+            friends = []
+            for row in res:
+                friends.append(row[0])
+
+            for i in range(0, len(friends)):
+                print("[{}] {}".format(i+1, friends[i-1]))
+
+            choice = int(input("Select which friend to remove: "))
+
+            if choice <= 0 or choice > len(friends):
+                input("Invalid selection. Press Enter to continue...")
+            else:
+                remove_friend(ukey, get_userkey(friends[choice-1]))
+                print("{} and {} are no longer friends.".format(get_username(ukey), get_userkey(friends[choice-1])))
+                input("Press Enter to continue...")
 
 def leaderboard_prompt():
     choice = ''
