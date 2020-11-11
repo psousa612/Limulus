@@ -10,7 +10,7 @@ import random
 
 ##User Functions
 def login(username, password):
-    return db.execute("SELECT * FROM users WHERE user_name = :uname AND password = :pass LIMIT 1", {"uname":username, "password":password})
+    return db.execute("SELECT * FROM users WHERE user_name = :uname AND password = :pass LIMIT 1", {"uname":username, "pass":password})
 
 def signup(info):
     db.execute("""INSERT INTO users(user_name, email, password, first_name, last_name, age, location, school) 
