@@ -3,6 +3,7 @@ from sqlalchemy import create_engine, exc
 from sqlalchemy.orm import scoped_session, sessionmaker
 import requests
 import random
+import hashlib
 ##DB Init Functions
 
 if not os.getenv("DATABASE_URL"):
@@ -17,7 +18,10 @@ def database_init():
                         user_key SERIAL PRIMARY KEY,
                         user_name TEXT UNIQUE NOT NULL,
                         password TEXT NOT NULL,
-                        email TEXT UNIQUE NOT NULL,
+                        email TEXT UNIQUE NOT NULL);""")
+
+        db.execute("""CREATE TABLE IF NOT EXISTS user_info (
+                        user_key INTEGER PRIMARY KEY,
                         first_name TEXT,
                         last_name TEXT,
                         age INTEGER,
@@ -29,12 +33,12 @@ def database_init():
                         question_key SERIAL PRIMARY KEY,
                         category TEXT NOT NULL,
                         prompt TEXT NOT NULL,
-                        correct TEXT NOT NULL,
-                        wrong1 TEXT NOT NULL,
-                        wrong2 TEXT NOT NULL,
-                        wrong3 TEXT NOT NULL,
                         author_key INTEGER DEFAULT -1 NOT NULL);""")
 
+        db.execute("""CREATE TABLE IF NOT EXISTS responses (
+                        question_key INTEGER,
+                        response TEXT NOT NULL,
+                        correct BOOLEAN);""")
 
         db.execute("""CREATE TABLE IF NOT EXISTS question_stats (
                 question_key INTEGER PRIMARY KEY,
@@ -67,10 +71,10 @@ def database_init():
         populateQuestions("https://opentdb.com/api.php?amount=30&category=15&type=multiple")
 
         populateUsers()
-        populateFriends()
-        populateQuestionStats()
-        populateLeaderboard()
-        populateQuestionHistory()
+        # populateFriends()
+        # populateQuestionStats()
+        # populateLeaderboard()
+        # populateQuestionHistory()
 
         db.commit()
 
@@ -80,11 +84,17 @@ def populateQuestions(url):
         results = response.json()["results"]
     
         for row in results:
-                db.execute("""INSERT INTO questions(category, prompt, correct, wrong1, wrong2, wrong3) 
-                        VALUES(:category, :prompt, :correct, :wrong1, :wrong2, :wrong3)""", {
+                qkey = db.execute("""INSERT INTO questions(category, prompt) 
+                        VALUES(:category, :prompt) RETURNING question_key""", {
                                 "category":row["category"], "prompt":row["question"],
                                 "correct":row["correct_answer"], "wrong1":row["incorrect_answers"][0],
-                                "wrong2":row["incorrect_answers"][1], "wrong3":row["incorrect_answers"][2]})
+                                "wrong2":row["incorrect_answers"][1], "wrong3":row["incorrect_answers"][2]}).fetchone()
+
+                db.execute("""INSERT INTO responses(question_key, response, correct)
+                                VALUES(:qkey, :res, :cor)""", {"qkey": qkey[0], "res": row["correct_answer"], "cor": True})
+                for i in range(0, 3):
+                        db.execute("""INSERT INTO responses(question_key, response, correct)
+                                          VALUES(:qkey, :res, :cor)""", {"qkey": qkey[0], "res": row["incorrect_answers"][i], "cor": False})
 
         db.commit()
 
@@ -94,17 +104,23 @@ def populateUsers():
                 ["psousa", "spam@gmail.com", "theseWillBeHashedEventually", None, "Sousa", 21, "San Jose", "UCMerced", 339]]
         
         for row in users:
-                db.execute("""INSERT INTO users(user_name, email, password, first_name, last_name, age, location, school, points) 
-                                VALUES(:uname, :email, :password, :f_name, :l_name, :age, :loc, :school, :points)""", {
+                passwordHash = hashlib.sha256()
+                passwordHash.update(row[2].encode('utf8'))
+                hashedPassword = str(passwordHash.hexdigest())
+                ukey = db.execute("""INSERT INTO users(user_name, email, password) 
+                                VALUES(:uname, :email, :password) RETURNING user_key""", {
                                         "uname": row[0],
                                         "email": row[1],
-                                        "password": row[2],
+                                        "password": hashedPassword}).fetchone()
+
+                db.execute("""INSERT INTO user_info(user_key, first_name, last_name, age, location, school)
+                                VALUES(:ukey, :f_name, :l_name, :age, :loc, :school)""", {
+                                        "ukey" : ukey[0],
                                         "f_name": row[3],
                                         "l_name": row[4],
                                         "age": row[5],
                                         "loc": row[6],
-                                        "school": row[7],
-                                        "points": row[8]})
+                                        "school": row[7]})
 
 def populateFriends():
         friends = [[1, 2], 
@@ -160,4 +176,21 @@ def populateQuestionHistory():
                         })
         db.commit()
 
+def deleteDatabase():
+        choice = input("You really want to delete all tables? y/n: ")
+
+        if choice == 'n':
+                input("Ok :) Press Enter to continue...")
+                return
+        else:
+                db.execute("DROP TABLE users")
+                db.execute("DROP TABLE friends")
+                db.execute("DROP TABLE questions")
+                db.execute("DROP TABLE question_stats")
+                db.execute("DROP TABLE question_history")
+                db.execute("DROP TABLE leaderboard")
+                db.commit()
+        
+
 database_init()
+

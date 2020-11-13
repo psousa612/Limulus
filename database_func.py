@@ -10,20 +10,23 @@ import random
 
 ##User Functions
 def login(username, password):
-    return db.execute("SELECT * FROM users WHERE user_name = :uname AND password = :pass LIMIT 1", {"uname":username, "password":password})
+    return db.execute("SELECT * FROM users WHERE user_name = :uname AND password = :pass LIMIT 1", {"uname":username, "pass":password})
 
 def signup(info):
-    db.execute("""INSERT INTO users(user_name, email, password, first_name, last_name, age, location, school) 
-                    VALUES(:uname, :email, :password, :f_name, :l_name, :age, :loc, :school)""", {
+    ukey = db.execute("""INSERT INTO users(user_name, email, password)
+                    VALUES(:uname, :email, :password) RETURNING user_key""", {
                             "uname": info[0],
                             "email": info[1],
-                            "password": info[2],
+                            "password": info[2]}).fetchone()
+
+    db.execute("""INSERT INTO user_info(user_key, first_name, last_name, age, location, school)
+                    VALUES(:ukey, :f_name, :l_name, :age, :loc, :school)""", {
+                            "ukey": ukey,
                             "f_name": info[3],
                             "l_name": info[4],
                             "age": info[5],
                             "loc": info[6],
                             "school": info[7]})
-
     db.commit()
 
 def add_friend(userkey, friendkey):
@@ -61,28 +64,28 @@ def remove_friend(ukey, fkey):
     db.commit()
 
 def get_username(userkey):
-    res = db.execute("SELECT user_name FROM users WHERE user_key = :ukey", {"ukey":userkey})
+    res = db.execute("SELECT user_name FROM user_info WHERE user_key = :ukey", {"ukey":userkey})
     for row in res:
         return row[0]
 
 def get_userkey(username):
-    res = db.execute("SELECT user_key FROM users WHERE user_name = :uname", {"uname":username})
+    res = db.execute("SELECT user_key FROM user_info WHERE user_name = :uname", {"uname":username})
     for row in res:
         return row[0]
 
 def get_points(userkey):
-    res = db.execute("SELECT points FROM users WHERE user_key = :ukey", {"ukey":userkey})
+    res = db.execute("SELECT points FROM user_info WHERE user_key = :ukey", {"ukey":userkey})
     for row in res:
         return row[0]
 
 def update_points(ukey):
-    db.execute("UPDATE users SET points = points + 1 WHERE user_key = :ukey", {"ukey":ukey})
+    db.execute("UPDATE user_info SET points = points + 1 WHERE user_key = :ukey", {"ukey":ukey})
     db.commit()
 
 ##Leaderboard functions
 def refresh_leaderboard():
     db.execute("DELETE FROM leaderboard")
-    result = db.execute("SELECT user_key, points FROM users ORDER BY points")
+    result = db.execute("SELECT user_key, points FROM user_info ORDER BY points")
 
     for row in result:
         db.execute("""INSERT INTO leaderboard(user_key, points)
@@ -138,6 +141,9 @@ def delete_user(user_key):
     #the users table
     db.execute("DELETE FROM users WHERE user_key=:user_key",{"user_key":int(user_key)})
 
+    #the user info table
+    db.execute("DELETE FROM user_info WHERE user_key=:user_key",{"user_key":int(user_key)})
+
     #the friends table
     db.execute("DELETE FROM friends WHERE user_key=:user_key OR friend_key=:user_key",{"user_key":int(user_key)})
     
@@ -172,30 +178,6 @@ def insert_question(question):
                         "auth_key":question[6]
                     });
     db.commit()
-
-def get_questions_from_user():
-    print("####################################")
-    os.system('clear')
-
-    ques_info = []
-    ques_info.append(input("Category: "))
-    ques_info.append(input("Question: "))
-    ques_info.append(input("The correct answer: "))
-    ques_info.append(input("Wrong answer 1: "))
-    ques_info.append(input("Wrong answer 2: "))
-    ques_info.append(input("Wrong answer 3: "))
-    ques_info.append(input("author key: (-1 for default / system): "))
-    
-    os.system('clear')
-    print(ques_info)
-
-    choice = input("Is this correct? y/n: ")
-
-    if choice == 'y':
-        insert_question(ques_info)
-    else:
-        print("Cancelling...")
-        input("Press Enter to continue...")
 
 def get_question_history(ukey):
     return db.execute("SELECT * FROM question_history WHERE user_key = :ukey", {"ukey":ukey})
@@ -312,6 +294,29 @@ def question_prompt():
 
             input("Press Enter to continue...")
 
+def get_questions_from_user():
+    print("####################################")
+    os.system('clear')
+
+    ques_info = []
+    ques_info.append(input("Category: "))
+    ques_info.append(input("Question: "))
+    ques_info.append(input("The correct answer: "))
+    ques_info.append(input("Wrong answer 1: "))
+    ques_info.append(input("Wrong answer 2: "))
+    ques_info.append(input("Wrong answer 3: "))
+    ques_info.append(input("author key: (-1 for default / system): "))
+    
+    os.system('clear')
+    print(ques_info)
+
+    choice = input("Is this correct? y/n: ")
+
+    if choice == 'y':
+        insert_question(ques_info)
+    else:
+        print("Cancelling...")
+        input("Press Enter to continue...")
 
 def checkForNone(value):
     if value == '':
@@ -550,7 +555,7 @@ def question_stats_prompt():
                 if opt == '1':
                     update_question_stats_correct(qkey)
                 elif opt == '2':
-                    update_question_stats_correct(qkey)
+                    update_question_stats_correct_first_try(qkey)
                 elif opt == '3':
                     update_question_stats_wrong(qkey)
 

@@ -31,16 +31,23 @@ def index():
 @app.route("/login", methods=["POST"])
 def login():
     login_params = request.get_json()
-    username = str(login_params["username"])
+    print(login_params)
+    username = str(login_params["username"]).upper()
     password = str(login_params["password"])
+    
     passwordHash = hashlib.sha256()
     passwordHash.update(password.encode('utf8'))
     hashedPassword = str(passwordHash.hexdigest())
+    
     if(db.execute("SELECT * FROM users WHERE upper(user_name) =:username AND password = :password", {"username": username, "password": hashedPassword}).rowcount == 1):
         user = db.execute("SELECT user_name FROM users WHERE upper(user_name) =:username", {
                           "username": username}).fetchone()
-        return("Logged in")
+        return {"response":200}
     else:
-        return("Wrong Username or Password")
+        return {"response:":401}
+
+@app.route("/yeet", methods=["GET"])
+def yeet():
+    return {"its lit": "litty"}
     
    

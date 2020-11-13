@@ -1,12 +1,32 @@
-import React from 'react';
+import React, {useState} from 'react';
+import {login} from './../api/login';
 import './style.scss';
 
 const LogIn = () => {
+    const [username, setUsername] = useState("")
+    const [password, setPassword] = useState("")
+
+    function handleSubmit(event) {
+        event.preventDefault()
+        
+        //Call the login api
+        login(username, password)
+    }
+
     return (
         <div>
             <div class="panel">
-                <p> hi</p>
-                
+                <form onSubmit={handleSubmit}>
+                    Username:
+                    <input type="text" onChange={e => setUsername(e.target.value)}></input>
+
+                    <br></br>
+                    Password: 
+                    <input type="password" onChange={e => setPassword(e.target.value)}></input>
+
+                    <br></br>
+                    <input type="submit"></input>
+                </form>
             </div>
         </div>
     );

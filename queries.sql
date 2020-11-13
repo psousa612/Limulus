@@ -56,7 +56,7 @@ INSERT INTO question_stats(question_key, total_amt, total_correct, total_first_t
           (2, 5, 5, 0),
           (3, 10, 4, 2);
 
-INSERT INTO leaderboard(ranking, user_key, points)
+INSERT INTO leaderboard(user_key, points)
     VALUES(1, 1, 1000),
           (2, 3, 601),
           (3, 2, 600);
