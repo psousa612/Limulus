@@ -8,6 +8,7 @@ import traceback
 import hashlib
 import requests
 
+from database_func import *
 
 app = Flask(__name__)
 
@@ -46,8 +47,19 @@ def login():
     else:
         return {"response:":401}
 
-@app.route("/yeet", methods=["GET"])
-def yeet():
-    return {"its lit": "litty"}
-    
-   
+
+# LEADERBOARD API
+@app.route("/leaderboard", methods=["GET"])
+def leaderboard():
+    board = fetch_top10()
+    toreturn = {}
+
+    for row in board:
+        toinsert = {
+            "name":row[2],
+            "points":row[3]
+        }
+
+        toreturn[str(row[0]):toinsert]
+
+    return {"whip":"nae nae"}

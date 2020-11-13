@@ -1,10 +1,18 @@
 import React from 'react';
+import {leaders} from './../api/leaderboard';
 import './style.scss';
 import './leaderboard.scss';
 
 import RowItem from './RowItem';
 
 const Leaderboard = () => {
+  const l = leaders()
+  // console.log(leaders)
+  // const rows = []
+  // for (leader in leaders) {
+  //   rows.push(<RowItem ranking={leader[0]} />)
+  // }
+
   return (
     <div class="panel">
       <h1> Leaderboard </h1>
@@ -19,9 +27,7 @@ const Leaderboard = () => {
       </thead>
 
       <tbody>
-        {/*Put the api call and create row items for each leaderboard row*/}
-      <RowItem ranking="1" username="yash" points="300"/>
-      <RowItem ranking="2" username="bob" points="299"/>
+        {console.log(l)}
       </tbody>
 
       </table>

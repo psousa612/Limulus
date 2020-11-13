@@ -9,4 +9,5 @@ export const login = (username, password) => {
     fetch('/login', requestOpts)
         .then(response => response.json())
         .then(data => console.log(data))
+    
 }

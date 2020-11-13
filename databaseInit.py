@@ -113,14 +113,15 @@ def populateUsers():
                                         "email": row[1],
                                         "password": hashedPassword}).fetchone()
 
-                db.execute("""INSERT INTO user_info(user_key, first_name, last_name, age, location, school)
-                                VALUES(:ukey, :f_name, :l_name, :age, :loc, :school)""", {
+                db.execute("""INSERT INTO user_info(user_key, first_name, last_name, age, location, school, points)
+                                VALUES(:ukey, :f_name, :l_name, :age, :loc, :school, :points)""", {
                                         "ukey" : ukey[0],
                                         "f_name": row[3],
                                         "l_name": row[4],
                                         "age": row[5],
                                         "loc": row[6],
-                                        "school": row[7]})
+                                        "school": row[7],
+                                        "points" : row[8]})
 
 def populateFriends():
         friends = [[1, 2], 
@@ -184,8 +185,10 @@ def deleteDatabase():
                 return
         else:
                 db.execute("DROP TABLE users")
+                db.execute("DROP TABLE user_info")
                 db.execute("DROP TABLE friends")
                 db.execute("DROP TABLE questions")
+                db.execute("DROP TABLE responses")
                 db.execute("DROP TABLE question_stats")
                 db.execute("DROP TABLE question_history")
                 db.execute("DROP TABLE leaderboard")

@@ -94,7 +94,10 @@ def refresh_leaderboard():
     db.commit()
 
 def fetch_top10():
-    return db.execute("SELECT ROW_NUMBER() OVER (ORDER BY points DESC), * FROM leaderboard ORDER BY points DESC")
+    return db.execute("""SELECT ROW_NUMBER() OVER (ORDER BY leaderboard.points DESC), user_info.user_key, users.user_name, user_info.points FROM leaderboard 
+                            JOIN user_info ON user_info.user_key = leaderboard.user_key 
+                            JOIN users ON users.user_key = user_info.user_key
+                            ORDER BY leaderboard.points DESC""").fetchall()
 
 ##Question functions
 def get_categories():
@@ -617,7 +620,7 @@ def view_tables():
         print("####################################")
 
 #Main Program
-os.system('clear')
+# os.system('clear')
 
 print("Initializing database...")
 if not os.getenv("DATABASE_URL"):
@@ -628,53 +631,53 @@ if not os.getenv("SECRET_KEY"):
 engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
 
-os.system('clear')
+# os.system('clear')
 
-choice = ''
-while choice != 'q':
-    print("##########################################")
-    print("""
-Welcome to.....
- ______    _      _        ___           
-/_  __/___(_)  __(_)__ _  / _ \___  ___ _
- / / / __/ / |/ / / _ `/ / ___/ _ \/ _ `/
-/_/ /_/ /_/|___/_/\_,_/ /_/   \___/\_, / 
-                                  /___/  
-""")
-    print("##########################################")
-    print("[1] View tables")
-    print("[2] Questions")
-    print("[3] Users")
-    print("[4] Friends")
-    print("[5] Leaderboard")
-    print("[6] Question Stats")
+# choice = ''
+# while choice != 'q':
+#     print("##########################################")
+#     print("""
+# Welcome to.....
+#  ______    _      _        ___           
+# /_  __/___(_)  __(_)__ _  / _ \___  ___ _
+#  / / / __/ / |/ / / _ `/ / ___/ _ \/ _ `/
+# /_/ /_/ /_/|___/_/\_,_/ /_/   \___/\_, / 
+#                                   /___/  
+# """)
+#     print("##########################################")
+#     print("[1] View tables")
+#     print("[2] Questions")
+#     print("[3] Users")
+#     print("[4] Friends")
+#     print("[5] Leaderboard")
+#     print("[6] Question Stats")
 
-    print("[q] Quit")
+#     print("[q] Quit")
 
-    choice = input("Select an option: ")
+#     choice = input("Select an option: ")
 
-    if choice == '1':
-        view_tables()
-    elif choice == '2':
-        question_prompt()
-    elif choice == '3':
-        user_prompt()
-    elif choice == '4':
-        friend_prompt()
-    elif choice == '5':
-        leaderboard_prompt()
-    elif choice == '6':
-        question_stats_prompt()
-    elif choice == '.':
-        os.system('clear')
-        try:
-            query = input()
-            db.execute(query)
-            db.commit()
-        except Exception as e:
-            print("Error! {}".format(e))
+#     if choice == '1':
+#         view_tables()
+#     elif choice == '2':
+#         question_prompt()
+#     elif choice == '3':
+#         user_prompt()
+#     elif choice == '4':
+#         friend_prompt()
+#     elif choice == '5':
+#         leaderboard_prompt()
+#     elif choice == '6':
+#         question_stats_prompt()
+#     elif choice == '.':
+#         os.system('clear')
+#         try:
+#             query = input()
+#             db.execute(query)
+#             db.commit()
+#         except Exception as e:
+#             print("Error! {}".format(e))
 
-        input("Press enter to continue...")
+#         input("Press enter to continue...")
 
-    print("####################################")
-    os.system('clear')
+#     print("####################################")
+#     os.system('clear')
