@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {login} from './../api/login';
+import History from './History';
 import './style.scss';
 
 const LogIn = () => {
@@ -10,7 +11,18 @@ const LogIn = () => {
         event.preventDefault()
         
         //Call the login api
-        login(username, password)
+        login(username, password).then((bool) => {
+            if(bool) {
+                console.log("log in good!")
+                localStorage.setItem("token", 3)
+                localStorage.setItem("username", username)
+                History.push('/dashboard')
+                
+            } else {
+                console.log("log in bad :(")
+                alert("Invalid Login! Try Again.")
+            }
+        })
     }
 
     return (

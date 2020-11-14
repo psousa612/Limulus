@@ -1,5 +1,3 @@
-import os
-
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from flask_session import Session
 from sqlalchemy import create_engine, exc
@@ -7,6 +5,8 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 import traceback
 import hashlib
 import requests
+import json
+import os
 
 from database_func import *
 
