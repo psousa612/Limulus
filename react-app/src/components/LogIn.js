@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import { Redirect } from 'react-router-dom';
 import {login} from './../api/login';
 import History from './History';
 import './style.scss';
@@ -17,7 +18,6 @@ const LogIn = () => {
                 localStorage.setItem("token", 3)
                 localStorage.setItem("username", username)
                 History.push('/dashboard')
-                
             } else {
                 console.log("log in bad :(")
                 alert("Invalid Login! Try Again.")

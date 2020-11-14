@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
+import { Router, Redirect, Route, Switch } from 'react-router-dom';
 import './App.scss';
 
 import LogIn from './components/LogIn';
@@ -9,14 +9,9 @@ import Leaderboard from './components/Leaderboard';
 import Navigation from './components/Navigation';
 import History from './components/History';
 
-
 const RequireAuth = ({children}) => {
-  console.log("local storage token is: ")
-  console.log(localStorage.getItem("token"))
-
-  if(localStorage.getItem("token") !== 3) {
+  if(localStorage.getItem("token") === null) {
     console.log("Not Logged in, redirecting...");
-    History.push('/');
     return <Redirect to="/" exact/>;
   } else {
     console.log("Logged In, going to original destination");
@@ -29,12 +24,11 @@ class App extends Component {
   render() {
 
     return (
-      <BrowserRouter history={History}>
+      <Router history={History} forceRefresh={true}>
         <div>
           <Navigation />
             <Switch>
             <Route path="/" component={LogIn} exact/>
-
             <RequireAuth>
               <Route path="/dashboard" component={Home}/>
               <Route path="/quiz" component={Quiz}/>
@@ -42,7 +36,7 @@ class App extends Component {
               </RequireAuth>
             </Switch>
         </div>
-      </BrowserRouter>
+      </Router>
     );
   }
 }

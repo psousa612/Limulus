@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 import History from './History'
 import './navigation.scss';
 
-function LogOut() {
+function logOut() {
   console.log("logggggin out ")
   localStorage.clear();
   History.push("/");
@@ -17,7 +17,7 @@ const Navigation = () => {
       <li><NavLink to="/dashboard" class="navlink">Dashboard</NavLink></li>
       <li><NavLink to="/leaderboard" class="navlink">Leaderboard</NavLink></li>
       {/* <li><NavLink to="/leaderboard" class="profile-pic">Leaderboard</NavLink></li> */}
-      <li><button onclick={LogOut}>Log Out</button></li>
+      <li><button onClick={logOut}>Log Out</button></li>
       </ul>
     </div>
   );
