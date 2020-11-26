@@ -65,7 +65,7 @@ def createuser():
         db.execute("INSERT INTO users (user_name,password,email) VALUES (:user_name, :password)",{"user_name":username, "password":hashedPassword})
         db.commit()
         return jsonify({"Success":"User created"}),200
-        
+
 # Add Friend API
 @app.route("/addFriend", methods = ["POST"])
 def addFriend():
@@ -75,6 +75,22 @@ def addFriend():
         db.execute("INSERT INTO friends(user_key, friend_key) VALUES(:ukey, :fkey)", {"ukey":userkey, "fkey":friendkey})
         db.commit()
         return jsonify({"Success":"Added Friend"}),200
+@app.route("/getFriends", methods = ["POST"])
+def getFriends():
+    getFriends_params = request.get_json()
+    userkey = str(getFriends_params["userkey"])
+    # Check if user exists:
+    if(db.execute("SELECT user_key FROM users WHERE user_key=:userkey",{"userkey":userkey}).rowcount != 1):
+        return jsonify({"error":"user doest exist"}),200
+    friendTable = db.execute("""SELECT friend_key FROM friends
+                    WHERE user_key = :ukey
+                    UNION
+                    SELECT user_key FROM friends
+                    WHERE friend_key = :ukey;""", {"ukey":userkey}).fetchall()
+    friends = []
+    for f in friendTable:
+        friends.append(f[0])
+    return jsonify({"friends":friends}),200
 
 # LEADERBOARD API
 @app.route("/leaderboard", methods=["GET"])
