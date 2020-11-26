@@ -4,6 +4,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 import requests
 import random
 import hashlib
+
 ##DB Init Functions
 
 if not os.getenv("DATABASE_URL"):

@@ -51,19 +51,9 @@ def login():
 @app.route("/leaderboard", methods=["GET"])
 def leaderboard():
     refresh_leaderboard()
-    board = fetch_top10()
-    d = {}
+    return makeJSON(fetch_top10())
 
-    index = 0
-    for row in board:
-        insert = {}
-
-        i = 0
-        for item in row:
-            insert.update({i:item})
-            i += 1
-        index += 1
-        d.update({index:insert})
-
-    return json.dumps(d)
+@app.route("/categories", methods=["GET"])
+def list_categories():
+    return makeJSON(get_categories())
     

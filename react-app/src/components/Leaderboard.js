@@ -26,6 +26,7 @@ const Leaderboard = () => {
           <th>Points</th>
         </tr>
       </thead>
+      <tbody>
         {/* how to loop through leader and display data in a RowItem */}
         {
           Object.keys(leader).map((value, index) => {
@@ -33,7 +34,7 @@ const Leaderboard = () => {
           })
 
         }
-      <tbody>
+      
         
       </tbody>
 

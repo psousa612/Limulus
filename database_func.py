@@ -5,8 +5,25 @@ import traceback
 import hashlib
 import requests
 import random
+import json
 
 #Function Definitions
+
+#JSONify Helper Function
+def makeJSON(data):
+    d = {}
+    index = 0
+    for row in data:
+        insert = {}
+
+        i = 0
+        for item in row:
+            insert.update({i:item})
+            i += 1
+        index += 1
+        d.update({index:insert})
+    
+    return json.dumps(d)
 
 ##User Functions
 def login(username, password):
@@ -103,7 +120,7 @@ def fetch_top10():
 
 ##Question functions
 def get_categories():
-    return db.execute("SELECT DISTINCT category FROM questions")
+    return db.execute("SELECT DISTINCT category FROM questions").fetchall()
 
 def random_question():
     return db.execute("SELECT * FROM questions ORDER BY RANDOM() LIMIT 1")
