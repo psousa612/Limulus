@@ -620,64 +620,65 @@ def view_tables():
         print("####################################")
 
 #Main Program
-# os.system('clear')
+if __name__ == "__main__":
+    os.system('clear')
 
-print("Initializing database...")
-if not os.getenv("DATABASE_URL"):
-    raise RuntimeError("DATABASE_URL is not set")
-if not os.getenv("SECRET_KEY"):
-    raise RuntimeError("SECRET_KEY is not set")
+    print("Initializing database...")
+    if not os.getenv("DATABASE_URL"):
+        raise RuntimeError("DATABASE_URL is not set")
+    if not os.getenv("SECRET_KEY"):
+        raise RuntimeError("SECRET_KEY is not set")
 
-engine = create_engine(os.getenv("DATABASE_URL"))
-db = scoped_session(sessionmaker(bind=engine))
+    engine = create_engine(os.getenv("DATABASE_URL"))
+    db = scoped_session(sessionmaker(bind=engine))
 
-# os.system('clear')
+    os.system('clear')
 
-# choice = ''
-# while choice != 'q':
-#     print("##########################################")
-#     print("""
-# Welcome to.....
-#  ______    _      _        ___           
-# /_  __/___(_)  __(_)__ _  / _ \___  ___ _
-#  / / / __/ / |/ / / _ `/ / ___/ _ \/ _ `/
-# /_/ /_/ /_/|___/_/\_,_/ /_/   \___/\_, / 
-#                                   /___/  
-# """)
-#     print("##########################################")
-#     print("[1] View tables")
-#     print("[2] Questions")
-#     print("[3] Users")
-#     print("[4] Friends")
-#     print("[5] Leaderboard")
-#     print("[6] Question Stats")
+    choice = ''
+    while choice != 'q':
+        print("##########################################")
+        print("""
+        Welcome to.....
+        ______    _      _        ___           
+        /_  __/___(_)  __(_)__ _  / _ \___  ___ _
+        / / / __/ / |/ / / _ `/ / ___/ _ \/ _ `/
+        /_/ /_/ /_/|___/_/\_,_/ /_/   \___/\_, / 
+                                        /___/  
+        """)
+        print("##########################################")
+        print("[1] View tables")
+        print("[2] Questions")
+        print("[3] Users")
+        print("[4] Friends")
+        print("[5] Leaderboard")
+        print("[6] Question Stats")
 
-#     print("[q] Quit")
+        print("[q] Quit")
 
-#     choice = input("Select an option: ")
+        choice = input("Select an option: ")
 
-#     if choice == '1':
-#         view_tables()
-#     elif choice == '2':
-#         question_prompt()
-#     elif choice == '3':
-#         user_prompt()
-#     elif choice == '4':
-#         friend_prompt()
-#     elif choice == '5':
-#         leaderboard_prompt()
-#     elif choice == '6':
-#         question_stats_prompt()
-#     elif choice == '.':
-#         os.system('clear')
-#         try:
-#             query = input()
-#             db.execute(query)
-#             db.commit()
-#         except Exception as e:
-#             print("Error! {}".format(e))
+        if choice == '1':
+            view_tables()
+        elif choice == '2':
+            question_prompt()
+        elif choice == '3':
+            user_prompt()
+        elif choice == '4':
+            friend_prompt()
+        elif choice == '5':
+            leaderboard_prompt()
+        elif choice == '6':
+            question_stats_prompt()
+        elif choice == '.':
+            os.system('clear')
+            try:
+                query = input()
+                db.execute(query)
+                db.commit()
+            except Exception as e:
+                print("Error! {}".format(e))
 
-#         input("Press enter to continue...")
+            input("Press enter to continue...")
 
-#     print("####################################")
-#     os.system('clear')
+        print("####################################")
+        os.system('clear')

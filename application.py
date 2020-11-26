@@ -32,7 +32,6 @@ def index():
 @app.route("/login", methods=["POST"])
 def login():
     login_params = request.get_json()
-    print(login_params)
     username = str(login_params["username"]).upper()
     password = str(login_params["password"])
     
@@ -52,14 +51,18 @@ def login():
 @app.route("/leaderboard", methods=["GET"])
 def leaderboard():
     board = fetch_top10()
-    toreturn = {}
+    d = {}
 
+    index = 0
     for row in board:
-        toinsert = {
-            "name":row[2],
-            "points":row[3]
-        }
+        insert = {}
 
-        toreturn[str(row[0]):toinsert]
+        i = 0
+        for item in row:
+            insert.update({i:item})
+            i += 1
+        index += 1
+        d.update({index:insert})
 
-    return {"whip":"nae nae"}
+    return json.dumps(d)
+    

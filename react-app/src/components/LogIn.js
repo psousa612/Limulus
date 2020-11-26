@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-import { Redirect } from 'react-router-dom';
 import {login} from './../api/login';
 import History from './History';
 import './style.scss';

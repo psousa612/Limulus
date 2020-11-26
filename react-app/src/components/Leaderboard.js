@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {leaders} from './../api/leaderboard';
 import './style.scss';
 import './leaderboard.scss';
@@ -6,15 +6,16 @@ import './leaderboard.scss';
 import RowItem from './RowItem';
 
 const Leaderboard = () => {
-  const l = leaders()
-  // console.log(leaders)
-  // const rows = []
-  // for (leader in leaders) {
-  //   rows.push(<RowItem ranking={leader[0]} />)
-  // }
+  const [leader, setLeader] = useState({})
+
+  function getLeaders() {
+    leaders().then((l) => {
+      setLeader(l);
+    })
+  }
 
   return (
-    <div class="panel">
+    <div class="panel" onLoad={getLeaders()}>
       <h1> Leaderboard </h1>
       
       <table>
@@ -25,9 +26,12 @@ const Leaderboard = () => {
           <th>Points</th>
         </tr>
       </thead>
-
+        {/* how to loop through leader and display data in a RowItem */}
+        {  
+        
+        }
       <tbody>
-        {console.log(l)}
+        
       </tbody>
 
       </table>

@@ -28,11 +28,12 @@ class App extends Component {
         <div>
           <Navigation />
             <Switch>
-            <Route path="/" component={LogIn} exact/>
-            <RequireAuth>
-              <Route path="/dashboard" component={Home}/>
-              <Route path="/quiz" component={Quiz}/>
-              <Route path="/leaderboard" component={Leaderboard}/>
+                <Route path="/" component={LogIn} exact/>
+                {/* signup page here */}
+              <RequireAuth>
+                <Route path="/dashboard" component={Home}/>
+                <Route path="/quiz" component={Quiz}/>
+                <Route path="/leaderboard" component={Leaderboard}/>
               </RequireAuth>
             </Switch>
         </div>

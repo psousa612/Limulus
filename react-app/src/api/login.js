@@ -10,7 +10,7 @@ export const login = async (username, password) => {
 
     await fetch('/login', requestOpts)
         .then(response => response.json())
-        .then(da => data = da)
+        .then(d => data = d)
     
     // console.log(data);
     return data["response"] === 200;
