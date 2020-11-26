@@ -50,6 +50,7 @@ def login():
 # LEADERBOARD API
 @app.route("/leaderboard", methods=["GET"])
 def leaderboard():
+    refresh_leaderboard()
     board = fetch_top10()
     d = {}
 

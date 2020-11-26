@@ -71,10 +71,10 @@ def database_init():
         populateQuestions("https://opentdb.com/api.php?amount=30&category=15&type=multiple")
 
         populateUsers()
-        # populateFriends()
-        # populateQuestionStats()
-        # populateLeaderboard()
-        # populateQuestionHistory()
+        populateFriends()
+        populateQuestionStats()
+        populateLeaderboard()
+        populateQuestionHistory()
 
         db.commit()
 
@@ -155,7 +155,7 @@ def populateQuestionStats():
 def populateLeaderboard():
         db.execute("DELETE FROM leaderboard")
     
-        result = db.execute("SELECT user_key, points FROM users ORDER BY points")
+        result = db.execute("SELECT user_key, points FROM user_info ORDER BY points")
 
         for row in result:
                 db.execute("""INSERT INTO leaderboard(user_key, points)
@@ -196,4 +196,5 @@ def deleteDatabase():
         
 
 database_init()
+# deleteDatabase()
 

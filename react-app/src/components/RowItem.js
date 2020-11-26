@@ -5,13 +5,13 @@ const RowItem = (props) => {
     return (
         <tr>
             <td>
-                {props.ranking}
+                {props.info[0]}
             </td>
             <td>
-                {props.username}
+                {props.info[2]}
             </td>
             <td>
-                {props.points}
+                {props.info[3]}
             </td>
         </tr>
     );

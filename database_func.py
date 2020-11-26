@@ -13,15 +13,19 @@ def login(username, password):
     return db.execute("SELECT * FROM users WHERE user_name = :uname AND password = :pass LIMIT 1", {"uname":username, "pass":password})
 
 def signup(info):
+    passwordHash = hashlib.sha256()
+    passwordHash.update(info[2].encode('utf8'))
+    hashedPassword = str(passwordHash.hexdigest())
+
     ukey = db.execute("""INSERT INTO users(user_name, email, password)
                     VALUES(:uname, :email, :password) RETURNING user_key""", {
                             "uname": info[0],
                             "email": info[1],
-                            "password": info[2]}).fetchone()
+                            "password": hashedPassword}).fetchone()
 
     db.execute("""INSERT INTO user_info(user_key, first_name, last_name, age, location, school)
                     VALUES(:ukey, :f_name, :l_name, :age, :loc, :school)""", {
-                            "ukey": ukey,
+                            "ukey": ukey[0],
                             "f_name": info[3],
                             "l_name": info[4],
                             "age": info[5],
@@ -64,10 +68,8 @@ def remove_friend(ukey, fkey):
     db.commit()
 
 def get_username(userkey):
-    res = db.execute("SELECT user_name FROM user_info WHERE user_key = :ukey", {"ukey":userkey})
-    for row in res:
-        return row[0]
-
+    return db.execute("SELECT user_name FROM users WHERE user_key = :ukey", {"ukey":userkey}).fetchone()[0]
+    
 def get_userkey(username):
     res = db.execute("SELECT user_key FROM user_info WHERE user_name = :uname", {"uname":username})
     for row in res:
@@ -618,6 +620,15 @@ def view_tables():
 
         input("Press Enter to continue...")
         print("####################################")
+
+
+if not os.getenv("DATABASE_URL"):
+    raise RuntimeError("DATABASE_URL is not set")
+if not os.getenv("SECRET_KEY"):
+    raise RuntimeError("SECRET_KEY is not set")
+
+engine = create_engine(os.getenv("DATABASE_URL"))
+db = scoped_session(sessionmaker(bind=engine))
 
 #Main Program
 if __name__ == "__main__":

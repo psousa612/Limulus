@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {leaders} from './../api/leaderboard';
 import './style.scss';
 import './leaderboard.scss';
@@ -8,14 +8,14 @@ import RowItem from './RowItem';
 const Leaderboard = () => {
   const [leader, setLeader] = useState({})
 
-  function getLeaders() {
+  useEffect( () => {
     leaders().then((l) => {
       setLeader(l);
     })
-  }
+  }, []);
 
   return (
-    <div class="panel" onLoad={getLeaders()}>
+    <div class="panel">
       <h1> Leaderboard </h1>
       
       <table>
@@ -27,8 +27,11 @@ const Leaderboard = () => {
         </tr>
       </thead>
         {/* how to loop through leader and display data in a RowItem */}
-        {  
-        
+        {
+          Object.keys(leader).map((value, index) => {
+            return <RowItem info={leader[value]} key={index} />
+          })
+
         }
       <tbody>
         
