@@ -42,10 +42,39 @@ def login():
     if(db.execute("SELECT * FROM users WHERE upper(user_name) =:username AND password = :password", {"username": username, "password": hashedPassword}).rowcount == 1):
         user = db.execute("SELECT user_name FROM users WHERE upper(user_name) =:username", {
                           "username": username}).fetchone()
-        return {"response":200}
+        return jsonify({"user_name": user.user_name, "email":user.email}),200
     else:
-        return {"response:":401}
+        return jsonify({"error":"unsuccesful"}),200
 
+#Create User API
+@app.route("/createuser", methods = ["POST"])
+#TODO: Check for duplicate usernames
+def createuser():
+    createuser_params = request.get_json()
+    username = str(createuser_params["username"]).upper()
+    password = str(createuser_params["password"])
+    passwordConf = str(createuser_params["passwordConf"])
+    if(passwordConf != password):
+        return("passwords dont match")
+    else:
+        if(db.execute("SELECT user_name FROM users WHERE user_name=:user_name",{"user_name":username}).rowcount != 0):
+                return jsonify({"error":"User already exists"}),200
+        passwordHash = hashlib.sha256()
+        passwordHash.update(password.encode('utf8'))
+        hashedPassword = str(passwordHash.hexdigest())
+        db.execute("INSERT INTO users (user_name,password,email) VALUES (:user_name, :password)",{"user_name":username, "password":hashedPassword})
+        db.commit()
+        return jsonify({"Success":"User created"}),200
+        
+# Add Friend API
+@app.route("/addFriend", methods = ["POST"])
+def addFriend():
+        addFriend_params = request.get_json()
+        userkey = str(addFriend_params["userkey"])
+        friendkey = str(addFriend_params["friendkey"])
+        db.execute("INSERT INTO friends(user_key, friend_key) VALUES(:ukey, :fkey)", {"ukey":userkey, "fkey":friendkey})
+        db.commit()
+        return jsonify({"Success":"Added Friend"}),200
 
 # LEADERBOARD API
 @app.route("/leaderboard", methods=["GET"])
