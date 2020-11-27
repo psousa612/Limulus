@@ -106,7 +106,7 @@ def leaderboard():
         data.append(row[3])
         finalData.append(data)
     return jsonify({"leaderboard":finalData}),200
-
+# Get categories API
 @app.route("/categories", methods=["GET"])
 def list_categories():
     cats = get_categories()
@@ -116,6 +116,7 @@ def list_categories():
 
     return jsonify({"categories":data}),200
 
+# Get Next Question API
 @app.route("/nextquestion", methods=["POST"])
 def nextQuestion():
     params = request.get_json()
@@ -135,6 +136,7 @@ def nextQuestion():
 
     return jsonify({"question":{"prompt":cleanQuestionData,"responses":cleanResponsesData}}),200
 
+# Get User Info API
 @app.route("/getuserinfo", methods=["POST"])
 def get_info():
     params = request.get_json()
