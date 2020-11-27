@@ -176,4 +176,14 @@ def getpoints():
     points = get_points(ukey)
     return jsonify({"points":points}),200
 
+# Update points API
+@app.route("/updatepoints", methods = ["POST"])
+def updatepoints():
+    params = request.get_json()
+    ukey = str(params["userkey"])
+    if(db.execute("SELECT user_key FROM users WHERE user_key=:userkey",{"userkey":ukey}).rowcount != 1):
+        return jsonify({"error":"user doest exist"}),200
+    update_points(ukey)
+    return jsonify({"Success":"Points updated"}),200
+
     
