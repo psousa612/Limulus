@@ -40,9 +40,9 @@ def login():
     hashedPassword = str(passwordHash.hexdigest())
     
     if(db.execute("SELECT * FROM users WHERE upper(user_name) =:username AND password = :password", {"username": username, "password": hashedPassword}).rowcount == 1):
-        user = db.execute("SELECT user_name FROM users WHERE upper(user_name) =:username", {
+        user = db.execute("SELECT user_key FROM users WHERE upper(user_name) =:username", {
                           "username": username}).fetchone()
-        return jsonify({"user_name": user.user_name, "email":user.email}),200
+        return jsonify({"user_key": user.user_key}),200
     else:
         return jsonify({"error":"unsuccesful"}),200
 
@@ -75,6 +75,7 @@ def addFriend():
         db.execute("INSERT INTO friends(user_key, friend_key) VALUES(:ukey, :fkey)", {"ukey":userkey, "fkey":friendkey})
         db.commit()
         return jsonify({"Success":"Added Friend"}),200
+        
 @app.route("/getFriends", methods = ["POST"])
 def getFriends():
     getFriends_params = request.get_json()
@@ -134,4 +135,12 @@ def nextQuestion():
 
     return jsonify({"question":{"prompt":cleanQuestionData,"responses":cleanResponsesData}}),200
 
-    
+@app.route("/getuserinfo", methods=["POST"])
+def get_info():
+    params = request.get_json()
+    uname = str(params["user_name"]).upper()
+    data = get_user_info(get_userkey(uname))
+    cleanData = []
+    for row in data:
+        cleanData.append(row)
+    return jsonify({"info":cleanData}),200

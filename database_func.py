@@ -88,9 +88,7 @@ def get_username(userkey):
     return db.execute("SELECT user_name FROM users WHERE user_key = :ukey", {"ukey":userkey}).fetchone()[0]
     
 def get_userkey(username):
-    res = db.execute("SELECT user_key FROM user_info WHERE user_name = :uname", {"uname":username})
-    for row in res:
-        return row[0]
+    return db.execute("SELECT user_key FROM users WHERE user_name = :uname", {"uname":username}).fetchone()[0]
 
 def get_points(userkey):
     res = db.execute("SELECT points FROM user_info WHERE user_key = :ukey", {"ukey":userkey})
@@ -178,7 +176,10 @@ def delete_user(user_key):
     #and the leaderboard table
     db.execute("DELETE FROM leaderboard WHERE user_key=:user_key",{"user_key":int(user_key)})
     db.commit()
-    
+
+def get_user_info(user_key):
+    return db.execute("SELECT * FROM user_info WHERE user_key=:ukey", {"ukey":user_key}).fetchone()
+
 def get_top_peer(user_key):
     return db.execute("SELECT * FROM users WHERE school = (SELECT school FROM users WHERE user_key=:user_key) ORDER BY points DESC LIMIT 1",{"user_key":int(user_key)}).fetchone()
 

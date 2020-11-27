@@ -11,8 +11,9 @@ const LogIn = () => {
         event.preventDefault()
         
         //Call the login api
-        login(username, password).then((bool) => {
-            if(bool) {
+        login(username, password).then((data) => {
+            console.log(data)
+            if(data["response"] === 200) {
                 console.log("log in good!")
                 localStorage.setItem("token", 3)
                 localStorage.setItem("username", username)

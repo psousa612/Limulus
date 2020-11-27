@@ -2,6 +2,7 @@ import React from 'react';
 import './rowitem.scss';
 
 const RowItem = (props) => {
+
     return (
         <tr>
             <td>

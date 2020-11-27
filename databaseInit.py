@@ -110,7 +110,7 @@ def populateUsers():
                 hashedPassword = str(passwordHash.hexdigest())
                 ukey = db.execute("""INSERT INTO users(user_name, email, password) 
                                 VALUES(:uname, :email, :password) RETURNING user_key""", {
-                                        "uname": row[0],
+                                        "uname": row[0].upper(),
                                         "email": row[1],
                                         "password": hashedPassword}).fetchone()
 

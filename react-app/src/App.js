@@ -8,6 +8,8 @@ import Quiz from './components/Quiz';
 import Leaderboard from './components/Leaderboard';
 import Navigation from './components/Navigation';
 import History from './components/History';
+import Profile from './components/Profile';
+import FindFriends from './components/FindFriends';
 
 const RequireAuth = ({children}) => {
   if(localStorage.getItem("token") === null) {
@@ -34,6 +36,8 @@ class App extends Component {
                 <Route path="/dashboard" component={Home}/>
                 <Route path="/quiz" component={Quiz}/>
                 <Route path="/leaderboard" component={Leaderboard}/>
+                <Route path="/profile" component={Profile}/>
+                <Route path="/findfriends" component={FindFriends}/>
               </RequireAuth>
             </Switch>
         </div>

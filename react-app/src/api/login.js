@@ -7,11 +7,18 @@ export const login = async (username, password) => {
     }
 
     var data;
+    var status;
 
     await fetch('/login', requestOpts)
-        .then(response => response.json())
+        .then(response => {
+            response.json();
+            status = response.status;
+        })
         .then(d => data = d)
-    
     // console.log(data);
-    return data["response"] === 200;
+    // console.log(status);
+    return {
+        "data":data,
+        "response":status
+    };
 }
