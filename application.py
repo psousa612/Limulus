@@ -186,4 +186,17 @@ def updatepoints():
     update_points(ukey)
     return jsonify({"Success":"Points updated"}),200
 
+# Get random Question
+@app.route("/randomquestion", methods = ["GET"])
+def randomquestion():
+    query = random_question()
+    questionkey = query[0]
+    category = query[1]
+    prompt = query[2]
+    authorkey= query[3]
+    return jsonify({"questionkey":questionkey,
+                    "category":category,
+                    "prompt":prompt,
+                    "authorkey":authorkey}),200
+        
     
