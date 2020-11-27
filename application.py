@@ -146,3 +146,14 @@ def get_info():
     for row in data:
         cleanData.append(row)
     return jsonify({"info":cleanData}),200
+
+# Remove Friend API
+@app.route("/removeFriend", methods = ["POST"])
+def removefriend():
+    params = request.get_json()
+    ukey = str(params["userkey"])
+    fkey = str(params["friendkey"])
+    remove_friend(ukey,fkey)
+    return jsonify({"Success":"Removed Friend"}),200
+
+# Get username API
