@@ -190,13 +190,33 @@ def updatepoints():
 @app.route("/randomquestion", methods = ["GET"])
 def randomquestion():
     query = random_question()
+    responses = get_responses(query[0])
     questionkey = query[0]
     category = query[1]
     prompt = query[2]
     authorkey= query[3]
+    r1 = responses[0][1]
+    r2 = responses[1][1]
+    r3 = responses[2][1]
+    r4 = responses[3][1]
+    i = 0
+    correctres = 0 
+    for r in responses:
+        if(r[2] == True):
+            correctres = i+1
+            break
+        i+=1
+    
     return jsonify({"questionkey":questionkey,
                     "category":category,
                     "prompt":prompt,
-                    "authorkey":authorkey}),200
+                    "authorkey":authorkey,
+                    "r1":r1,
+                    "r2":r2,
+                    "r3":r3,
+                    "r4":r4,
+                    "correctres":correctres}),200
+
+
         
     
