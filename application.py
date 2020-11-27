@@ -217,6 +217,21 @@ def randomquestion():
                     "r4":r4,
                     "correctres":correctres}),200
 
+# Get question stats
+@app.route('/questionstats', methods = ["POST"])
+def questionstats():
+    params = request.get_json()
+    qkey = str(params["questionkey"]) 
+    stats = get_question_stats(qkey)
+    qkey = stats[0]
+    total_amt = stats[1]
+    total_correct = stats[2]
+    total_first_try_correct = stats[3]
+    return jsonify({"question_key":qkey,
+                    "total_amt":total_amt,
+                    "total_correct":total_correct,
+                    "total_first_try_correct":total_first_try_correct}),200
+    
 
         
     
