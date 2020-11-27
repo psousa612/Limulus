@@ -121,7 +121,7 @@ def get_categories():
     return db.execute("SELECT DISTINCT category FROM questions").fetchall()
 
 def random_question():
-    return db.execute("SELECT * FROM questions ORDER BY RANDOM() LIMIT 1")
+    return db.execute("SELECT * FROM questions ORDER BY RANDOM() LIMIT 1").fetchone()
 
 def random_question_with_category(category):
     return db.execute("SELECT * FROM questions WHERE category = :cat ORDER BY RANDOM() LIMIT 1", {"cat":category}).fetchone()
