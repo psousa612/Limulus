@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import History from './History'
+import History from './History';
 import './navigation.scss';
 
 function logOut() {

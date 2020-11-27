@@ -96,9 +96,42 @@ def getFriends():
 @app.route("/leaderboard", methods=["GET"])
 def leaderboard():
     refresh_leaderboard()
-    return makeJSON(fetch_top10())
+    board = fetch_top10()
+    finalData = []
+    for row in board:
+        data = []
+        data.append(row[0])
+        data.append(row[2])
+        data.append(row[3])
+        finalData.append(data)
+    return jsonify({"leaderboard":finalData}),200
 
 @app.route("/categories", methods=["GET"])
 def list_categories():
-    return makeJSON(get_categories())
+    cats = get_categories()
+    data = []
+    for row in cats:
+        data.append(row[0])
+
+    return jsonify({"categories":data}),200
+
+@app.route("/nextquestion", methods=["POST"])
+def nextQuestion():
+    params = request.get_json()
+    requestedCat = str(params["category"])
+    questionData = random_question_with_category(requestedCat)
+    cleanQuestionData = []
+    for item in questionData:
+        cleanQuestionData.append(item)
+
+    responsesData = get_responses(questionData[0])
+    cleanResponsesData = []
+    for row in responsesData:
+        toInsert = []
+        for item in row:
+            toInsert.append(item)
+        cleanResponsesData.append(toInsert)
+
+    return jsonify({"question":{"prompt":cleanQuestionData,"responses":cleanResponsesData}}),200
+
     

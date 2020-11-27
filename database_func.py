@@ -10,20 +10,20 @@ import json
 #Function Definitions
 
 #JSONify Helper Function
-def makeJSON(data):
-    d = {}
-    index = 0
-    for row in data:
-        insert = {}
+# def makeJSON(data):
+#     d = {}
+#     index = 0
+#     for row in data:
+#         insert = {}
 
-        i = 0
-        for item in row:
-            insert.update({i:item})
-            i += 1
-        index += 1
-        d.update({index:insert})
+#         i = 0
+#         for item in row:
+#             insert.update({i:item})
+#             i += 1
+#         index += 1
+#         d.update({index:insert})
     
-    return json.dumps(d)
+#     return json.dumps(d)
 
 ##User Functions
 def login(username, password):
@@ -126,7 +126,10 @@ def random_question():
     return db.execute("SELECT * FROM questions ORDER BY RANDOM() LIMIT 1")
 
 def random_question_with_category(category):
-    return db.execute("SELECT * FROM questions WHERE category = :cat ORDER BY RANDOM() LIMIT 1", {"cat":category})
+    return db.execute("SELECT * FROM questions WHERE category = :cat ORDER BY RANDOM() LIMIT 1", {"cat":category}).fetchone()
+
+def get_responses(qkey):
+    return db.execute("SELECT * FROM responses WHERE question_key = :qkey ORDER BY RANDOM()", {"qkey":qkey}).fetchall()
 
 def get_question_stats(q_key):
     return db.execute("SELECT * FROM question_stats WHERE question_key = :q_key", {"q_key":q_key}).fetchone()

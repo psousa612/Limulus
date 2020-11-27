@@ -8,10 +8,10 @@ const RowItem = (props) => {
                 {props.info[0]}
             </td>
             <td>
-                {props.info[2]}
+                {props.info[1]}
             </td>
             <td>
-                {props.info[3]}
+                {props.info[2]}
             </td>
         </tr>
     );

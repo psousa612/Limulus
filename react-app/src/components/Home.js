@@ -1,13 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import {categories} from '../api/questions';
+import History from './History';
+import {getCategories} from '../api/questions';
 import './style.scss';
 
 const Home = () => {
   const [cats, setCats] = useState({})
+  
+  function changeSelection(e) {
+    // console.log(e.target.value);
+    localStorage.setItem("cat", e.target.value);
+  }
+
+  function startQuiz() {
+    console.log(localStorage.getItem("cat"))
+    History.push("/quiz")
+  }
 
   useEffect( () => {
-    categories().then((l) => {
+    getCategories().then((l) => {
       setCats(l);
+      localStorage.setItem("cat", l[0])
     })
   }, []);
 
@@ -16,20 +28,15 @@ const Home = () => {
       <h1> home </h1>
       <h2>take da quiz</h2>
       
-      <select class="category-selector">
+      <select class="category-selector" onChange={changeSelection}>
         {
-          Object.keys(cats).map((index) => {
-          return <option value={cats[index]} key={index}>{cats[index][0].toString()}</option>
+          Object.keys(cats).map((value, index) => {
+            return <option key={index}>{cats[value]}</option>
           })
         }
-
-        {/* <option value="?">cs</option>
-        <option value="?">meth</option>
-        <option value="?">sceience</option> */}
-
       </select>
 
-      <a href="/quiz">start da quiz</a>
+      <button onClick={startQuiz}>take da quiz</button>
 
 
     </div>
