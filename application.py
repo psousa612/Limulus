@@ -165,4 +165,15 @@ def getusername():
         return jsonify({"error":"user doest exist"}),200
     username = get_username(ukey)
     return jsonify({"username":username}),200
+
+# Get points API
+@app.route("/getpoints", methods = ["POST"])
+def getpoints():
+    params = request.get_json()
+    ukey = str(params["userkey"])
+    if(db.execute("SELECT user_key FROM users WHERE user_key=:userkey",{"userkey":ukey}).rowcount != 1):
+        return jsonify({"error":"user doest exist"}),200
+    points = get_points(ukey)
+    return jsonify({"points":points}),200
+
     
