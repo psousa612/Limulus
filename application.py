@@ -157,3 +157,12 @@ def removefriend():
     return jsonify({"Success":"Removed Friend"}),200
 
 # Get username API
+@app.route("/getusername",methods = ["POST"])
+def getusername():
+    params = request.get_json()
+    ukey = str(params["userkey"])
+    if(db.execute("SELECT user_key FROM users WHERE user_key=:userkey",{"userkey":ukey}).rowcount != 1):
+        return jsonify({"error":"user doest exist"}),200
+    username = get_username(ukey)
+    return jsonify({"username":username}),200
+    
