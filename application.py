@@ -232,6 +232,31 @@ def questionstats():
                     "total_correct":total_correct,
                     "total_first_try_correct":total_first_try_correct}),200
     
+# Get top peer 
+@app.route('/gettoppeer',methods = ["POST"])
+def gettoppeer():
+    params = request.get_json()
+    ukey = str(params["userkey"])
+    if(db.execute("SELECT user_key FROM users WHERE user_key=:userkey",{"userkey":ukey}).rowcount != 1):
+        return jsonify({"error":"user doest exist"}),200    
+    top_peer = get_top_peer(ukey)
+    user_key = top_peer[0]
+    user_name = top_peer[1]
+    email = top_peer[2]
+    first_name = top_peer[3]
+    last_name = top_peer[4]
+    age = top_peer[5]
+    location = top_peer[6]
+    school = top_peer[7]
+    return jsonify({"user_key":user_key,
+                    "user_name":user_name,
+                    "email":email,
+                    "first_name":first_name,
+                    "last_name":last_name,
+                    "age":age,
+                    "location":location,
+                    "school":school}),200
+
 
         
     
