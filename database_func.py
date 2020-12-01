@@ -184,7 +184,7 @@ def get_top_peer(user_key):
     return db.execute("SELECT users.user_key,user_name,email,first_name,last_name,age,location,school FROM users INNER JOIN user_info ON user_info.user_key = users.user_key WHERE school = (SELECT school FROM users WHERE user_key=:user_key) ORDER BY points DESC LIMIT 1",{"user_key":int(user_key)}).fetchone()
 
 def get_top_ten_school():
-    return db.execute("SELECT ROW_NUMBER() OVER (ORDER BY SUM(points)), school FROM users GROUP BY school ORDER BY SUM(points) LIMIT 10")
+    return db.execute("SELECT ROW_NUMBER() OVER (ORDER BY SUM(points)), school FROM users INNER JOIN user_info ON users.user_key=user_info.user_key GROUP BY school ORDER BY SUM(points) LIMIT 10").fetchall()
 
 def get_toughest_question():
     return db.execute("SELECT question_key FROM question_stats WHERE total_amt != 0 ORDER BY total_first_try_correct ASC LIMIT 1").fetchone()

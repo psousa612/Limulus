@@ -258,5 +258,15 @@ def gettoppeer():
                     "school":school}),200
 
 
+# Get top 10 schools
+@app.route('/get_top_schools')
+def get_top_schools():
+   res = get_top_ten_school()
+   numSchools = len(res)
+   rankings = {}
+   for r in res:
+       rankings[r[0]] = r[1]
+
+   return jsonify(rankings),200
         
     
