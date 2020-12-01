@@ -31,18 +31,18 @@ def login(username, password):
 
 def signup(info):
     passwordHash = hashlib.sha256()
-    passwordHash.update(info[2].encode('utf8'))
+    passwordHash.update(info[1].encode('utf8'))
     hashedPassword = str(passwordHash.hexdigest())
 
     ukey = db.execute("""INSERT INTO users(user_name, email, password)
                     VALUES(:uname, :email, :password) RETURNING user_key""", {
-                            "uname": info[0],
-                            "email": info[1],
-                            "password": hashedPassword}).fetchone()
+                            "uname": info[0].upper(),
+                            "email": info[2],
+                            "password": hashedPassword}).fetchone()[0]
 
     db.execute("""INSERT INTO user_info(user_key, first_name, last_name, age, location, school)
                     VALUES(:ukey, :f_name, :l_name, :age, :loc, :school)""", {
-                            "ukey": ukey[0],
+                            "ukey": ukey,
                             "f_name": info[3],
                             "l_name": info[4],
                             "age": info[5],
@@ -68,36 +68,46 @@ def get_friends_with_info(userkey):
                     UNION
                     SELECT * FROM friends
                     JOIN users ON users.user_key = friends.user_key
-                    WHERE friend_key = :ukey;""", {"ukey":userkey})
+                    WHERE friend_key = :ukey;""", {"ukey":userkey}).fetchall()
 
 def get_friends_with_name(userkey):
-    return db.execute("""SELECT user_name FROM friends
+    return db.execute("""SELECT users.user_key, user_name FROM friends
                     JOIN users ON users.user_key = friends.friend_key
                     WHERE friends.user_key = :ukey
                     UNION
-                    SELECT user_name FROM friends
+                    SELECT friends.user_key, user_name FROM friends
                     JOIN users ON users.user_key = friends.user_key
-                    WHERE friend_key = :ukey;""", {"ukey":userkey})
+                    WHERE friend_key = :ukey;""", {"ukey":userkey}).fetchall()
 
 def remove_friend(ukey, fkey):
     db.execute("""DELETE FROM friends WHERE (user_key = :ukey AND friend_key = :fkey) 
                     OR (user_key = :fkey AND friend_key = :ukey)""", {"ukey":ukey, "fkey":fkey})
     db.commit()
 
+def get_nonfriends(ukey):
+    return db.execute("""SELECT user_key, user_name FROM users WHERE user_key != :ukey 
+                            EXCEPT (SELECT users.user_key, user_name FROM friends
+                                        JOIN users ON users.user_key = friends.friend_key
+                                        WHERE friends.user_key = :ukey
+                                        UNION
+                                        SELECT friends.user_key, user_name FROM friends
+                                        JOIN users ON users.user_key = friends.user_key
+                                        WHERE friend_key = :ukey)""", {"ukey":ukey}).fetchall()
+
 def get_username(userkey):
     return db.execute("SELECT user_name FROM users WHERE user_key = :ukey", {"ukey":userkey}).fetchone()[0]
     
 def get_userkey(username):
-    return db.execute("SELECT user_key FROM users WHERE user_name = :uname", {"uname":username}).fetchone()[0]
+    return db.execute("SELECT user_key FROM users WHERE user_name = :uname", {"uname":username.upper()}).fetchone()[0]
 
 def get_points(userkey):
-    res = db.execute("SELECT points FROM user_info WHERE user_key = :ukey", {"ukey":userkey})
-    for row in res:
-        return row[0]
+    return db.execute("SELECT points FROM user_info WHERE user_key = :ukey", {"ukey":userkey}).fetchone()[0]
+    
 
 def update_points(ukey):
-    db.execute("UPDATE user_info SET points = points + 1 WHERE user_key = :ukey", {"ukey":ukey})
+    points = db.execute("UPDATE user_info SET points = points + 1 WHERE user_key = :ukey RETURNING points", {"ukey":ukey}).fetchone()
     db.commit()
+    return points[0]
 
 ##Leaderboard functions
 def refresh_leaderboard():
@@ -132,6 +142,9 @@ def get_responses(qkey):
 def get_question_stats(q_key):
     return db.execute("SELECT * FROM question_stats WHERE question_key = :q_key", {"q_key":q_key}).fetchone()
 
+def search_question_history(ukey, qkey):
+    return db.execute("SELECT COUNT(*) FROM question_history WHERE question_key = :qkey AND user_key = :ukey", {"qkey":qkey, "ukey":ukey}).fetchone()
+
 def random_question_with_stats():
     return db.execute("""SELECT * FROM questions 
                          LEFT JOIN question_stats ON question_stats.question_key = questions.question_key
@@ -154,10 +167,11 @@ def update_question_stats_correct_first_try(q_key):
     db.execute("""UPDATE question_stats 
                     SET total_amt = total_amt + 1,
                         total_correct = total_correct + 1,
-                        total_first_ty_correct = total_first_ty_correct + 1
+                        total_first_try_correct = total_first_try_correct + 1
                     WHERE question_key = :q_key""", {"q_key":q_key})
     db.commit()
-    
+
+
 def delete_user(user_key):
     #To completly remove a user, we need to remove them from:
 
@@ -192,17 +206,25 @@ def get_toughest_question():
 def get_question(q_key):
     return db.execute("SELECT * FROM questions WHERE question_key = :qkey", {"qkey":q_key}).fetchone()
 
-def insert_question(question):
-    db.execute("""INSERT INTO questions(category, prompt, correct, wrong1, wrong2, wrong3, author_key)
-                    VALUES(:cat, :prompt, :correct, :wrong1, :wrong2, :wrong3, :auth_key)""", {
-                        "cat":question[0],
-                        "prompt":question[1],
-                        "correct":question[2],
-                        "wrong1":question[3],
-                        "wrong2":question[4],
-                        "wrong3":question[5],
-                        "auth_key":question[6]
-                    });
+def insert_question(questionInfo, userkey):
+    # Insert the question into the main question table
+    qkey = db.execute("""INSERT INTO questions(category, prompt, author_key)
+                    VALUES(:cat, :prompt, :auth_key)
+                    RETURNING question_key""", {
+                        "cat":questionInfo[0],
+                        "prompt":questionInfo[1],
+                        "auth_key":userkey
+                    }).fetchone()[0];
+
+    # Insert the responses into the responses table
+    db.execute("INSERT INTO responses(question_key, response, correct) VALUES(:qkey, :res, :cor)", {"qkey":qkey, "res":questionInfo[2], "cor":True})
+    for i in range(3, len(questionInfo)):
+        row = questionInfo[i]
+        db.execute("INSERT INTO responses(question_key, response, correct) VALUES(:qkey, :res, :cor)", {"qkey":qkey, "res":row, "cor":False})
+    
+    # Insert a new question history entry for the new question
+    db.execute("INSERT INTO question_stats(question_key) VALUES(:qkey)", {"qkey":qkey})
+
     db.commit()
 
 def get_question_history(ukey):
@@ -211,9 +233,12 @@ def get_question_history(ukey):
 def get_question_history_with_info(ukey):
     return db.execute("""SELECT question_history.question_key, prompt FROM question_history 
                             JOIN questions ON questions.question_key = question_history.question_key
-                            JOIN users ON users.user_key = question_history.user_key
-                            WHERE users.user_key = :ukey""", {"ukey":ukey})
+                            WHERE question_history.user_key = :ukey""", {"ukey":ukey})
 
+def insert_question_history(ukey, qkey):
+    db.execute("""INSERT INTO question_history(user_key, question_key)
+                    VALUES(:ukey, :qkey)""", {"ukey":ukey, "qkey":qkey})
+    db.commit()
 
 ##Prompts
 def quiz_prompt(question):
@@ -594,8 +619,6 @@ def question_stats_prompt():
                 print("Something went wrong! :(")
             input("Press Enter to continue...")
             
-
-
 ##Misc Functions
 def print_table(table_name):
     result = db.execute("SELECT * FROM :table_name", {"table_name":table_name})

@@ -20,6 +20,8 @@ if not os.getenv("SECRET_KEY"):
 
 engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
+
+
 # ROOT
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -47,51 +49,65 @@ def login():
         return jsonify({"error":"unsuccesful"}),200
 
 #Create User API
-@app.route("/createuser", methods = ["POST"])
+@app.route("/signup", methods = ["POST"])
 #TODO: Check for duplicate usernames
 def createuser():
     createuser_params = request.get_json()
-    username = str(createuser_params["username"]).upper()
-    password = str(createuser_params["password"])
-    passwordConf = str(createuser_params["passwordConf"])
-    if(passwordConf != password):
-        return("passwords dont match")
-    else:
-        if(db.execute("SELECT user_name FROM users WHERE user_name=:user_name",{"user_name":username}).rowcount != 0):
-                return jsonify({"error":"User already exists"}),200
-        passwordHash = hashlib.sha256()
-        passwordHash.update(password.encode('utf8'))
-        hashedPassword = str(passwordHash.hexdigest())
-        db.execute("INSERT INTO users (user_name,password,email) VALUES (:user_name, :password)",{"user_name":username, "password":hashedPassword})
-        db.commit()
-        return jsonify({"Success":"User created"}),200
+    info = createuser_params["info"]
+    username = info[0].upper()
+    # passwordConf = str(createuser_params["passwordConf"])
+    # if(passwordConf != password):
+    #     return("passwords dont match")
+    # else:
+    if(db.execute("SELECT user_name FROM users WHERE user_name=:user_name",{"user_name":username}).rowcount != 0):
+            return jsonify({"error":"User already exists"}),200
+    signup(info)
+    return jsonify({"Success":"User created"}),200
+
+@app.route("/addUserInfo", methods = ["POST"])
+def add_user_info():
+    pass
 
 # Add Friend API
 @app.route("/addFriend", methods = ["POST"])
 def addFriend():
         addFriend_params = request.get_json()
-        userkey = str(addFriend_params["userkey"])
+        username = str(addFriend_params["username"]) 
         friendkey = str(addFriend_params["friendkey"])
-        db.execute("INSERT INTO friends(user_key, friend_key) VALUES(:ukey, :fkey)", {"ukey":userkey, "fkey":friendkey})
-        db.commit()
+
+        add_friend(get_userkey(username), friendkey)
         return jsonify({"Success":"Added Friend"}),200
-        
+
 @app.route("/getFriends", methods = ["POST"])
 def getFriends():
     getFriends_params = request.get_json()
-    userkey = str(getFriends_params["userkey"])
+    username = str(getFriends_params["user_name"])
+    userkey = get_userkey(username)
     # Check if user exists:
     if(db.execute("SELECT user_key FROM users WHERE user_key=:userkey",{"userkey":userkey}).rowcount != 1):
         return jsonify({"error":"user doest exist"}),200
-    friendTable = db.execute("""SELECT friend_key FROM friends
-                    WHERE user_key = :ukey
-                    UNION
-                    SELECT user_key FROM friends
-                    WHERE friend_key = :ukey;""", {"ukey":userkey}).fetchall()
+    friendTable = get_friends_with_name(userkey)
     friends = []
     for f in friendTable:
-        friends.append(f[0])
+        temp = []
+        temp.append(f[0])
+        temp.append(f[1])
+        friends.append(temp)
     return jsonify({"friends":friends}),200
+
+@app.route("/getNonFriends", methods=["POST"])
+def user_list():
+    params = request.get_json()
+    username = str(params["username"])
+    data = get_nonfriends(get_userkey(username))
+    cleanData = []
+    for row in data:
+        toInsert = []
+        toInsert.append(row[0])
+        toInsert.append(row[1])
+        cleanData.append(toInsert)
+    
+    return jsonify({"users":cleanData})
 
 # LEADERBOARD API
 @app.route("/leaderboard", methods=["GET"])
@@ -106,6 +122,7 @@ def leaderboard():
         data.append(row[3])
         finalData.append(data)
     return jsonify({"leaderboard":finalData}),200
+
 # Get categories API
 @app.route("/categories", methods=["GET"])
 def list_categories():
@@ -176,17 +193,47 @@ def getpoints():
     points = get_points(ukey)
     return jsonify({"points":points}),200
 
-# Update points API
+# Update Points API
 @app.route("/updatepoints", methods = ["POST"])
 def updatepoints():
     params = request.get_json()
-    ukey = str(params["userkey"])
-    if(db.execute("SELECT user_key FROM users WHERE user_key=:userkey",{"userkey":ukey}).rowcount != 1):
+    uname = str(params["user_name"])
+    if(db.execute("SELECT username FROM users WHERE user_name=:uname",{"uname":uname}).rowcount != 1):
         return jsonify({"error":"user doest exist"}),200
-    update_points(ukey)
-    return jsonify({"Success":"Points updated"}),200
+    points = update_points(get_userkey(uname))
+    return jsonify({"points":points}),200
 
-# Get random Question
+@app.route("/answeredquestion", methods=["POST"])
+def updateUser():
+    params = request.get_json()
+    uname = str(params["user_name"]).upper()
+    qkey = int(params["qkey"])
+    result = bool(params["result"])
+    ukey = get_userkey(uname)
+    
+    # Update points based on correctness
+    points = 0
+    if result == True:
+        points = update_points(ukey)
+    else:
+        points = get_points(ukey)
+
+    # Update user question history
+    insert_question_history(ukey, qkey)
+
+    # Update question stats
+    res = search_question_history(ukey, qkey)
+    if res != None and result == True:
+        update_question_stats_correct_first_try(qkey)
+    elif result == True:
+        update_question_stats_correct(qkey)
+    else:
+        update_question_stats_wrong(qkey)
+    
+    return jsonify({"points":points}),200
+
+    
+# Get Random Question
 @app.route("/randomquestion", methods = ["GET"])
 def randomquestion():
     query = random_question()
@@ -217,6 +264,17 @@ def randomquestion():
                     "r4":r4,
                     "correctres":correctres}),200
 
+# Insert a question
+@app.route("/addQuestion", methods=["POST"])
+def add_new_question():
+    params = request.get_json()
+    questionInfo = params["info"]
+    ukey = get_userkey(str(params["username"]))
+    # print(questionInfo)
+    insert_question(questionInfo, ukey)
+
+    return jsonify({"Success":"Question Added"}),200
+
 # Get question stats
 @app.route('/questionstats', methods = ["POST"])
 def questionstats():
@@ -231,7 +289,23 @@ def questionstats():
                     "total_amt":total_amt,
                     "total_correct":total_correct,
                     "total_first_try_correct":total_first_try_correct}),200
+
+# Get Question History
+@app.route('/questionhistory', methods=["POST"])
+def question_history():
+    params = request.get_json()
+    uname = str(params["user_name"])
+    ukey = get_userkey(uname)
+    data = get_question_history_with_info(ukey)
+    cleanData = []
+    for row in data:
+        toInsert = []
+        toInsert.append(row[0])
+        toInsert.append(row[1])
+        cleanData.append(toInsert)
     
+    return jsonify({"history":cleanData})
+
 # Get top peer 
 @app.route('/gettoppeer',methods = ["POST"])
 def gettoppeer():

@@ -195,7 +195,7 @@ def deleteDatabase():
                 db.execute("DROP TABLE leaderboard")
                 db.commit()
         
-
+deleteDatabase()
 database_init()
-# deleteDatabase()
+
 

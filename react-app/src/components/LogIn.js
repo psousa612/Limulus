@@ -28,6 +28,7 @@ const LogIn = () => {
     return (
         <div>
             <div class="panel">
+                <h2>LogIn</h2>
                 <form onSubmit={handleSubmit}>
                     Username:
                     <input type="text" onChange={e => setUsername(e.target.value)}></input>

@@ -12,12 +12,17 @@ const Home = () => {
   }
 
   function startQuiz() {
-    console.log(localStorage.getItem("cat"))
+    // console.log(localStorage.getItem("cat"))
     History.push("/quiz")
+  }
+
+  function submitQuestion() {
+    History.push("/addquestion")
   }
 
   useEffect( () => {
     getCategories().then((l) => {
+      
       setCats(l);
       localStorage.setItem("cat", l[0])
     })
@@ -38,7 +43,10 @@ const Home = () => {
 
       <button onClick={startQuiz}>take da quiz</button>
 
-
+      <br/>
+      <br/>
+      <br/>
+      <button onClick={submitQuestion}>Submit a Question</button>
     </div>
   );
 }

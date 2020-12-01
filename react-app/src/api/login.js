@@ -22,3 +22,20 @@ export const login = async (username, password) => {
         "response":status
     };
 }
+
+export const signup = async (info) => {
+    var data
+    const requestOpts = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({"info":info})
+    }
+
+    await fetch('/signup', requestOpts)
+        .then(response => response.json())
+        .then(d => data = d)
+        
+    // console.log(data);
+    // console.log(status);
+    return data
+}
