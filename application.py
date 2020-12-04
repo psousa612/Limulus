@@ -121,6 +121,7 @@ def leaderboard():
         data.append(row[2])
         data.append(row[3])
         finalData.append(data)
+    
     return jsonify({"leaderboard":finalData}),200
 
 # Get categories API
