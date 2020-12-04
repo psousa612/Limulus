@@ -19,7 +19,7 @@ if not os.getenv("SECRET_KEY"):
     raise RuntimeError("SECRET_KEY is not set")
 
 engine = create_engine(os.getenv("DATABASE_URL"))
-db = scoped_session(sessionmaker(bind=engine))
+# db = scoped_session(sessionmaker(bind=engine))
 
 
 # ROOT
@@ -33,6 +33,7 @@ def index():
 # LOGIN API
 @app.route("/login", methods=["POST"])
 def login():
+    db = scoped_session(sessionmaker(bind=engine))
     login_params = request.get_json()
     username = str(login_params["username"]).upper()
     password = str(login_params["password"])
@@ -44,8 +45,10 @@ def login():
     if(db.execute("SELECT * FROM users WHERE upper(user_name) =:username AND password = :password", {"username": username, "password": hashedPassword}).rowcount == 1):
         user = db.execute("SELECT user_key FROM users WHERE upper(user_name) =:username", {
                           "username": username}).fetchone()
+        db.close()
         return jsonify({"user_key": user.user_key}),200
     else:
+        db.close()
         return jsonify({"error":"unsuccesful"}),200
 
 #Create User API
