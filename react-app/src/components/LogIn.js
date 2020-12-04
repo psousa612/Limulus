@@ -28,17 +28,15 @@ const LogIn = () => {
     return (
         <div>
             <div class="panel">
-                <h2>LogIn</h2>
+                <h1>Log In</h1>
                 <form onSubmit={handleSubmit}>
-                    Username:
-                    <input type="text" onChange={e => setUsername(e.target.value)}></input>
+                    <label for="uname">Username: </label>
+                    <input type="text" id="uname" onChange={e => setUsername(e.target.value)}></input>
 
-                    <br></br>
-                    Password: 
-                    <input type="password" onChange={e => setPassword(e.target.value)}></input>
+                    <label for="password">Password: </label>
+                    <input type="password" id="password" onChange={e => setPassword(e.target.value)}></input>
 
-                    <br></br>
-                    <input type="submit"></input>
+                    <button type="submit">Submit</button>
                 </form>
             </div>
         </div>

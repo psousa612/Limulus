@@ -22,27 +22,27 @@ const addQuestion = () => {
     return (
         <div class="panel">
             <form onSubmit={handleSubmit}>
+                <h1>Add A Question</h1>
                 <label for="cat">Category: </label>
-                <input id="cat" required></input>
+                <input id="cat" type="text" autocomplete="off" required></input>
                 
                 <br/>
                 <label for="prompt">Question: </label>
-                <input id="prompt" required></input>
+                <input id="prompt" type="text" autocomplete="off" required></input>
                 <br/>
                 <label for="correct">Correct Answer: </label>
-                <input id="correct" required></input>
+                <input id="correct" type="text" autocomplete="off" required></input>
                 <br/>
                 <label for="wrong1">Wrong Answer 1: </label>
-                <input id="wrong1" required></input>
+                <input id="wrong1" type="text" autocomplete="off" required></input>
                 <br/>
                 <label for="wrong2">Wrong Answer 2: </label>
-                <input id="wrong2" required></input>
+                <input id="wrong2" type="text" autocomplete="off" required></input>
                 <br/>
                 <label for="wrong3">Wrong Answer 3: </label>
-                <input id="wrong3" required></input>
+                <input id="wrong3" type="text" autocomplete="off" required></input>
                 <br/>
-
-                <input type="submit"></input>
+                <button type="submit">Submit</button>
             </form>
         </div>
     );

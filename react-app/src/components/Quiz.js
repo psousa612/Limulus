@@ -83,7 +83,7 @@ const Quiz = () => {
 
     return (
         <div class="panel">
-            <h2>yar this do be the quiz page</h2>
+            <h2>Quiz</h2>
             <h1>{prompt}</h1>
             
 
@@ -98,14 +98,15 @@ const Quiz = () => {
 
             <br/>
             {<p hidden={!disabled}>{resultText}</p>}
-            <br/>
             {<p hidden={!disabled}>You have {pointsText} points.</p>}
-            <br/>
+
             <button onClick={nextQuestion} hidden={!disabled}>Next Question</button>
             <br/>
-            <br/>
-            <table hidden={!disabled}>
-                <h2>Statistics For This Question</h2>
+            
+            <table hidden={!disabled} class="question-stats">
+            <h2>Statistics For This Question</h2>
+            <hr></hr>
+            <tbody>
                 {
                     questionStats.map((value, index) => {
                     return <tr key={index}><td>{statsHeaders[index]}</td><td>{value}</td></tr>
@@ -114,6 +115,7 @@ const Quiz = () => {
                 {
                     <tr key={questionStats.length}><td>Total Wrong Answers</td><td>{questionStats[1]-questionStats[2]}</td></tr>
                 }
+            </tbody>
             </table>
         </div>
     );

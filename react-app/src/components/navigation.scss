@@ -1,35 +1,70 @@
 .navbar {
-  margin: 0, 0, 3em, 0;
-  padding: 0;
-  width: 100%;
-  float: left;
-  background-color: black;
-  list-style: none;
-
   display: flex;
-  a {
-    float: left;
+  background-color: #343148;
+  
+
+  ul {
+    width: 100%;
+    height: 100%;
   }
 
-  // li {
-  //   display: inline;
+  li {
+    float: left;
+    display: block;
+    margin: 0, auto, 0, auto;
+    padding-left: 10px;
+    padding-right: 10px;
     
-  //   float: left;
-  // }
 
-  // a {
-  //   display: block;
-  //   padding: 8px;
-  //   margin-left: 8px;
-  //   margin-right: 8px;
-  //   border: 2px black;
-  //   background-color: green;
+    .right-align {
+      margin-left: auto;
+    }
 
-  // }
-  
-  // .profile-pic {
-  //   margin-left: 100%;
-  //   background-color: pink;
-  // }
+    
+  }
+
+  li:hover {
+    background-color: pink;
+  }
+
 
 }
+
+// .navbar {
+//   position: absolute;
+//   margin-top: 0;
+  
+
+//   padding: 0;
+//   width: 100%;
+//   float: left;
+//   background-color: black;
+//   list-style: none;
+
+//   display: flexbox;
+//   a {
+//     float: left;
+//   }
+
+//   // li {
+//   //   display: inline;
+    
+//   //   float: left;
+//   // }
+
+//   // a {
+//   //   display: block;
+//   //   padding: 8px;
+//   //   margin-left: 8px;
+//   //   margin-right: 8px;
+//   //   border: 2px black;
+//   //   background-color: green;
+
+//   // }
+  
+//   // .profile-pic {
+//   //   margin-left: 100%;
+//   //   background-color: pink;
+//   // }
+
+// }

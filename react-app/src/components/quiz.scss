@@ -1,7 +1,35 @@
-
-
-
 .button-grid{
-    display: flexbox;
+    justify-content: center;
+    display: grid;
+    grid-template-columns: 30% 30%;
+    grid-row: auto auto;
+    grid-column-gap: 20px;
+    grid-row-gap: 20px;
     
+    button {
+       font-size: 30px;
+       padding:20px;
+       border-radius:10px;
+       display:flex;
+       align-items:center;
+       justify-content:center;
+    }
+}
+
+.panel p {
+    font-size: 30px;
+}
+
+.question-stats {
+    width: 100%;
+    margin: auto;
+
+    td {
+        width: 25%;
+    }
+
+    hr {
+        width: 100%;
+        align-self: center;
+    }
 }

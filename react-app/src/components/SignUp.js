@@ -22,35 +22,34 @@ const SignUp = () => {
 
     return (
         <div class="panel">
-            <h2>Sign Up</h2>
+            <h1>Sign Up</h1>
             <form onSubmit={handleSubmit}>
                 <label for="username">Username: </label>
-                <input id="username" required></input>
-                <br/>
-                <label for="password" type="password">Password: </label>
-                <input id="password" required></input>
-                <br/>
-                <label for="email" type="email">Email: </label>
-                <input id="email" required></input>
-                <br/>
+                <input id="username" type="text" autocomplete="off" required></input>
+                
+                <label for="password" >Password: </label>
+                <input id="password" type="password" autocomplete="off" required></input>
+                
+                <label for="email" >Email: </label>
+                <input id="email" type="email" autocomplete="off" required></input>
+                
                 <h3>Optional Fields:</h3>
                 <label for="firstname">First Name: </label>
-                <input id="firstname"></input>
-                <br/>
+                <input id="firstname" type="text" ></input>
+          
                 <label for="lastname">Last Name: </label>
-                <input id="lastname"></input>
-                <br/>
+                <input id="lastname" type="text" ></input>
+     
                 <label for="age">Age: </label>
-                <input id="age"></input>
-                <br/>
+                <input id="age" type="text"></input>
+           
                 <label for="location">Location: </label>
-                <input id="location"></input>
-                <br/>
+                <input id="location" type="text"></input>
+            
                 <label for="school">School: </label>
-                <input id="school"></input>
-                <br/>
+                <input id="school" type="text"></input>
 
-                <input type="submit"/>
+                <button type="submit">Submit</button>
             </form>
         </div>
     )

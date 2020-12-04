@@ -16,11 +16,15 @@ const Home = () => {
     History.push("/quiz")
   }
 
-  function submitQuestion() {
-    History.push("/addquestion")
-  }
+
 
   useEffect( () => {
+    if(localStorage.getItem("refreshed") == null) {
+      localStorage.setItem("refreshed", true);
+      window.location.reload()
+      return;
+    }
+
     getCategories().then((l) => {
       
       setCats(l);
@@ -30,8 +34,8 @@ const Home = () => {
 
   return (
     <div class="panel">
-      <h1> home </h1>
-      <h2>take da quiz</h2>
+      <h1> Dashboard </h1>
+      <h2>Quiz Set-Up</h2>
       
       <select class="category-selector" onChange={changeSelection}>
         {
@@ -40,13 +44,10 @@ const Home = () => {
           })
         }
       </select>
+      <br/>
 
-      <button onClick={startQuiz}>take da quiz</button>
-
-      <br/>
-      <br/>
-      <br/>
-      <button onClick={submitQuestion}>Submit a Question</button>
+      
+      <button onClick={startQuiz}>Start Quiz</button>
     </div>
   );
 }
