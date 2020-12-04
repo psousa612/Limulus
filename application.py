@@ -8,19 +8,15 @@ import requests
 import json
 import os
 
-from database_func import *
-
-app = Flask(__name__)
-
 # Check for environment variable
 if not os.getenv("DATABASE_URL"):
     raise RuntimeError("DATABASE_URL is not set")
 if not os.getenv("SECRET_KEY"):
     raise RuntimeError("SECRET_KEY is not set")
 
-engine = create_engine(os.getenv("DATABASE_URL"))
-# db = scoped_session(sessionmaker(bind=engine))
+from database_func import *
 
+app = Flask(__name__)
 
 # ROOT
 @app.route("/", methods=["GET", "POST"])
@@ -58,18 +54,10 @@ def createuser():
     createuser_params = request.get_json()
     info = createuser_params["info"]
     username = info[0].upper()
-    # passwordConf = str(createuser_params["passwordConf"])
-    # if(passwordConf != password):
-    #     return("passwords dont match")
-    # else:
     if(db.execute("SELECT user_name FROM users WHERE user_name=:user_name",{"user_name":username}).rowcount != 0):
             return jsonify({"error":"User already exists"}),200
     signup(info)
     return jsonify({"Success":"User created"}),200
-
-@app.route("/addUserInfo", methods = ["POST"])
-def add_user_info():
-    pass
 
 # Add Friend API
 @app.route("/addFriend", methods = ["POST"])
@@ -130,18 +118,18 @@ def leaderboard():
 # Get categories API
 @app.route("/categories", methods=["GET"])
 def list_categories():
-    db = scoped_session(sessionmaker(bind=engine))
+    # db = scoped_session(sessionmaker(bind=engine))
     cats = get_categories()
     data = []
     for row in cats:
         data.append(row[0])
-    db.close()
+    # db.close()
     return jsonify({"categories":data}),200
 
 # Get Next Question API
 @app.route("/nextquestion", methods=["POST"])
 def nextQuestion():
-    db = scoped_session(sessionmaker(bind=engine))
+    # db = scoped_session(sessionmaker(bind=engine))
     params = request.get_json()
     requestedCat = str(params["category"])
     questionData = random_question_with_category(requestedCat)
@@ -156,7 +144,7 @@ def nextQuestion():
         for item in row:
             toInsert.append(item)
         cleanResponsesData.append(toInsert)
-    db.close()
+    # db.close()
     return jsonify({"question":{"prompt":cleanQuestionData,"responses":cleanResponsesData}}),200
 
 # Get User Info API
@@ -211,7 +199,7 @@ def updatepoints():
 
 @app.route("/answeredquestion", methods=["POST"])
 def updateUser():
-    db = scoped_session(sessionmaker(bind=engine))
+    # db = scoped_session(sessionmaker(bind=engine))
     params = request.get_json()
     uname = str(params["user_name"]).upper()
     qkey = int(params["qkey"])
@@ -236,7 +224,7 @@ def updateUser():
         update_question_stats_correct(qkey)
     else:
         update_question_stats_wrong(qkey)
-    db.close()
+    # db.close()
     return jsonify({"points":points}),200
 
     
@@ -286,7 +274,7 @@ def add_new_question():
 # Get question stats
 @app.route('/questionstats', methods = ["POST"])
 def questionstats():
-    db = scoped_session(sessionmaker(bind=engine))
+    # db = scoped_session(sessionmaker(bind=engine))
     params = request.get_json()
     qkey = str(params["questionkey"]) 
     stats = get_question_stats(qkey)
@@ -294,7 +282,7 @@ def questionstats():
     total_amt = stats[1]
     total_correct = stats[2]
     total_first_try_correct = stats[3]
-    db.close()
+    # db.close()
     return jsonify({"question_key":qkey,
                     "total_amt":total_amt,
                     "total_correct":total_correct,

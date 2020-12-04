@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {leaders} from './../api/leaderboard';
-import './style.scss';
-import './leaderboard.scss';
+// import './style.scss';
+// import './leaderboard.scss';
 
 import RowItem from './RowItem';
 
