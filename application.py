@@ -130,16 +130,18 @@ def leaderboard():
 # Get categories API
 @app.route("/categories", methods=["GET"])
 def list_categories():
+    db = scoped_session(sessionmaker(bind=engine))
     cats = get_categories()
     data = []
     for row in cats:
         data.append(row[0])
-
+    db.close()
     return jsonify({"categories":data}),200
 
 # Get Next Question API
 @app.route("/nextquestion", methods=["POST"])
 def nextQuestion():
+    db = scoped_session(sessionmaker(bind=engine))
     params = request.get_json()
     requestedCat = str(params["category"])
     questionData = random_question_with_category(requestedCat)
@@ -154,7 +156,7 @@ def nextQuestion():
         for item in row:
             toInsert.append(item)
         cleanResponsesData.append(toInsert)
-
+    db.close()
     return jsonify({"question":{"prompt":cleanQuestionData,"responses":cleanResponsesData}}),200
 
 # Get User Info API
@@ -209,6 +211,7 @@ def updatepoints():
 
 @app.route("/answeredquestion", methods=["POST"])
 def updateUser():
+    db = scoped_session(sessionmaker(bind=engine))
     params = request.get_json()
     uname = str(params["user_name"]).upper()
     qkey = int(params["qkey"])
@@ -233,7 +236,7 @@ def updateUser():
         update_question_stats_correct(qkey)
     else:
         update_question_stats_wrong(qkey)
-    
+    db.close()
     return jsonify({"points":points}),200
 
     
@@ -271,17 +274,19 @@ def randomquestion():
 # Insert a question
 @app.route("/addQuestion", methods=["POST"])
 def add_new_question():
+    db = scoped_session(sessionmaker(bind=engine))
     params = request.get_json()
     questionInfo = params["info"]
     ukey = get_userkey(str(params["username"]))
     # print(questionInfo)
     insert_question(questionInfo, ukey)
-
+    db.close()
     return jsonify({"Success":"Question Added"}),200
 
 # Get question stats
 @app.route('/questionstats', methods = ["POST"])
 def questionstats():
+    db = scoped_session(sessionmaker(bind=engine))
     params = request.get_json()
     qkey = str(params["questionkey"]) 
     stats = get_question_stats(qkey)
@@ -289,6 +294,7 @@ def questionstats():
     total_amt = stats[1]
     total_correct = stats[2]
     total_first_try_correct = stats[3]
+    db.close()
     return jsonify({"question_key":qkey,
                     "total_amt":total_amt,
                     "total_correct":total_correct,
