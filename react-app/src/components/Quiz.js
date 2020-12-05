@@ -103,17 +103,16 @@ const Quiz = () => {
             <button onClick={nextQuestion} hidden={!disabled}>Next Question</button>
             <br/>
             
+            <h2 hidden={!disabled}>Statistics For This Question</h2>
             <table hidden={!disabled} class="question-stats">
-            <h2>Statistics For This Question</h2>
-            <hr></hr>
             <tbody>
                 {
                     questionStats.map((value, index) => {
-                    return <tr key={index}><td>{statsHeaders[index]}</td><td>{value}</td></tr>
+                    return <tr key={index}><td class="td-header">{statsHeaders[index]}:</td><td class="td-value">{value}</td></tr>
                     })
                 }
                 {
-                    <tr key={questionStats.length}><td>Total Wrong Answers</td><td>{questionStats[1]-questionStats[2]}</td></tr>
+                    <tr key={questionStats.length}><td class="td-header">Total Wrong Answers</td><td class="td-value">{questionStats[1]-questionStats[2]}</td></tr>
                 }
             </tbody>
             </table>

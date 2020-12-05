@@ -36,7 +36,7 @@ const Home = () => {
     <div class="panel">
       <h1> Dashboard </h1>
       <h2>Quiz Set-Up</h2>
-      
+      <label>Pick A Category: </label>
       <select class="category-selector" onChange={changeSelection}>
         {
           Object.keys(cats).map((value, index) => {
@@ -45,8 +45,7 @@ const Home = () => {
         }
       </select>
       <br/>
-
-      
+      <br/>
       <button onClick={startQuiz}>Start Quiz</button>
     </div>
   );

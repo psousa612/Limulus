@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {getUserInfo, getUserHistory, getFriends, removeFriend} from '../api/user';
 import './style.scss';
+import './profile.scss';
 
 const Profile = () => {
     const [info, setInfo] = useState([])
@@ -47,11 +48,16 @@ const Profile = () => {
     return (
         <div class="panel">
             <h2>User Info</h2>
+            <table>
             {
                 info.map((value, index) => {
-                    return <div><h3>{infoHeaders[index]}</h3><p>{value}</p></div>
+                return <tr>
+                            <td class="info-header"><h3>{infoHeaders[index]}</h3></td>
+                            <td>{value}</td>
+                        </tr>
                 })
             }
+            </table>
 
             <br/>
             <button onClick={toggleShowHistory}>{showHistory ? "Hide Question History" :  "Show Question History"}</button>
@@ -59,7 +65,7 @@ const Profile = () => {
             <br/>
 
             { showHistory ? 
-            <table>
+            <table class="question-history">
                 <thead>
                     <th>qKey</th>
                     <th>Prompt</th>
@@ -69,7 +75,10 @@ const Profile = () => {
                     {history.map((value, index) => {
                         let scrubbedPrompt = value[1].replace(/&quot;/g, '\\"')
                         scrubbedPrompt = value[1].replace(/&#039;/g, '\\"')
-                        return <tr key={index}><td>{value[0]}</td><td>{scrubbedPrompt}</td></tr>
+                        return <tr key={index}>
+                                    <td>{value[0]}</td>
+                                    <td>{scrubbedPrompt}</td>
+                                </tr>
                     })}
                 </tbody>
             </table> : null
@@ -77,7 +86,7 @@ const Profile = () => {
 
             { showFriends ?
             
-            <table>
+            <table class="friends-list">
                 <thead>
                     <th>uKey</th>
                     <th>Username</th>
@@ -85,7 +94,11 @@ const Profile = () => {
 
                 <tbody>
                     {friends.map((value, index) => {
-                        return <tr key={index}><td>{value[0]}</td><td>{value[1]}</td><td><button onClick={handleUnfriend} id={index}>Remove Friend</button></td>  </tr>
+                        return <tr key={index}>
+                                    <td>{value[0]}</td>
+                                    <td>{value[1]}</td>
+                                    <td class="button-col"><button onClick={handleUnfriend} id={index}>Remove Friend</button></td>
+                                </tr>
                     })
                     }
                 </tbody>

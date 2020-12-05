@@ -25,11 +25,16 @@
     margin: auto;
 
     td {
-        width: 25%;
+        width: auto;
     }
 
-    hr {
-        width: 100%;
-        align-self: center;
+    .td-header {
+        text-align: right;
+        width: 50%;
+    }
+
+    .td-value {
+        text-align: left;
+        padding-left: 10%;
     }
 }
