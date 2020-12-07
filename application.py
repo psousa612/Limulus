@@ -129,10 +129,15 @@ def list_categories():
 # Get Next Question API
 @app.route("/nextquestion", methods=["POST"])
 def nextQuestion():
-    # db = scoped_session(sessionmaker(bind=engine))
     params = request.get_json()
     requestedCat = str(params["category"])
-    questionData = random_question_with_category(requestedCat)
+    username = str(params["username"])
+
+    questionData = random_question_with_category_no_repeats(requestedCat, get_userkey(username))
+
+    if questionData == None:
+        questionData = random_question_with_category(requestedCat)
+
     cleanQuestionData = []
     for item in questionData:
         cleanQuestionData.append(item)
@@ -213,17 +218,17 @@ def updateUser():
     else:
         points = get_points(ukey)
 
-    # Update user question history
-    insert_question_history(ukey, qkey)
-
     # Update question stats
-    res = search_question_history(ukey, qkey)
-    if res != None and result == True:
+    res = search_question_history(ukey, qkey)[0]
+    if res == 0 and result == True:
         update_question_stats_correct_first_try(qkey)
     elif result == True:
         update_question_stats_correct(qkey)
     else:
         update_question_stats_wrong(qkey)
+
+    # Update user question history
+    insert_question_history(ukey, qkey)
     # db.close()
     return jsonify({"points":points}),200
 

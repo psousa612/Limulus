@@ -93,7 +93,9 @@ const Profile = () => {
                 </thead>
 
                 <tbody>
-                    {friends.map((value, index) => {
+                    {
+                    
+                    friends.map((value, index) => {
                         return <tr key={index}>
                                     <td>{value[0]}</td>
                                     <td>{value[1]}</td>

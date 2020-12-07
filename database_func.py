@@ -8,7 +8,7 @@ import random
 import json
 
 
-engine = create_engine(os.getenv("DATABASE_URL"))
+engine = create_engine(os.getenv("DATABASE_URL"), pool_timeout = 7.0)
 db = scoped_session(sessionmaker(bind=engine))
 
 #Function Definitions
@@ -139,6 +139,12 @@ def random_question():
 
 def random_question_with_category(category):
     return db.execute("SELECT * FROM questions WHERE category = :cat ORDER BY RANDOM() LIMIT 1", {"cat":category}).fetchone()
+
+def random_question_with_category_no_repeats(category, ukey):
+    return db.execute("""SELECT * FROM questions 
+                            WHERE category = :cat
+                                AND question_key NOT IN (SELECT question_key FROM question_history WHERE user_key = :ukey)
+                            ORDER BY RANDOM() LIMIT 1""", {"cat":category, "ukey":ukey}).fetchone()
 
 def get_responses(qkey):
     return db.execute("SELECT * FROM responses WHERE question_key = :qkey ORDER BY RANDOM()", {"qkey":qkey}).fetchall()

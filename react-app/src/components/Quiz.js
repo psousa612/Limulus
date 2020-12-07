@@ -49,18 +49,9 @@ const Quiz = () => {
                 }
             }
             setButtons(buts)
-        }).then(() => {
-            getQuestionStats(currQkey).then((data) => {
-                let statsData = []
-                statsData.push(data["question_key"])
-                statsData.push(data["total_amt"])
-                statsData.push(data["total_correct"])
-                statsData.push(data["total_first_try_correct"])
-    
-                setQuestionStats(statsData)
-            })
         })
     }
+
 
 
     function handleClick(e) {
@@ -77,7 +68,18 @@ const Quiz = () => {
         answeredQuestion(uname, questionData["prompt"][0], correct)
             .then((data) => {
                 setPointsText(data)
+            }).then(() => {
+                getQuestionStats(questionData["prompt"][0]).then((data) => {
+                    let statsData = []
+                    statsData.push(data["question_key"])
+                    statsData.push(data["total_amt"])
+                    statsData.push(data["total_correct"])
+                    statsData.push(data["total_first_try_correct"])
+        
+                    setQuestionStats(statsData)
+                })
             })
+
         setDisabled(true)
     }
 
@@ -95,27 +97,34 @@ const Quiz = () => {
                     })
                 }
             </div>
-
-            <br/>
-            {<p hidden={!disabled}>{resultText}</p>}
-            {<p hidden={!disabled}>You have {pointsText} points.</p>}
-
-            <button onClick={nextQuestion} hidden={!disabled}>Next Question</button>
-            <br/>
             
-            <h2 hidden={!disabled}>Statistics For This Question</h2>
-            <table hidden={!disabled} class="question-stats">
-            <tbody>
-                {
-                    questionStats.map((value, index) => {
-                    return <tr key={index}><td class="td-header">{statsHeaders[index]}:</td><td class="td-value">{value}</td></tr>
-                    })
+            <div hidden={!disabled}>
+                <br/>
+                {<p>{resultText}</p>}
+                {resultText === "Wrong!" ? 
+                    <p> Correct Answer: {correctResponse}</p>
+                    : null
                 }
-                {
-                    <tr key={questionStats.length}><td class="td-header">Total Wrong Answers</td><td class="td-value">{questionStats[1]-questionStats[2]}</td></tr>
-                }
-            </tbody>
-            </table>
+
+                {<p>You have {pointsText} points.</p>}
+
+                <button onClick={nextQuestion}>Next Question</button>
+                <br/>
+                
+                <h2>Statistics For This Question</h2>
+                <table class="question-stats">
+                <tbody>
+                    {
+                        questionStats.map((value, index) => {
+                        return <tr key={index}><td class="td-header">{statsHeaders[index]}:</td><td class="td-value">{value}</td></tr>
+                        })
+                    }
+                    {
+                        <tr key={questionStats.length}><td class="td-header">Total Wrong Answers</td><td class="td-value">{questionStats[1]-questionStats[2]}</td></tr>
+                    }
+                </tbody>
+                </table>
+            </div>
         </div>
     );
 }

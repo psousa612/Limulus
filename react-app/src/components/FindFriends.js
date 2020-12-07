@@ -29,6 +29,9 @@ const FindFriends = () => {
 
                 <tbody>
                     {
+                    userList.length === 0 ? 
+                        <p>No other users to display!</p>
+                        :
                         userList.map((value, index) => {
                         return <tr key={index}>
                                     <td>{value[0]}</td>

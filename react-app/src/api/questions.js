@@ -21,7 +21,7 @@ export const getQuestion = async () => {
     const requestOpts = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({"category":localStorage.getItem("cat")})
+        body: JSON.stringify({"category":localStorage.getItem("cat"), "username":localStorage.getItem("username")})
     }
 
     await fetch('/nextquestion', requestOpts)
