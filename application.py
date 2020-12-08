@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
-from flask_cors import CORS, cross_origin
+# from flask_cors import CORS, cross_origin
 from flask_session import Session
 from sqlalchemy import create_engine, exc
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -18,7 +18,7 @@ if not os.getenv("SECRET_KEY"):
 from database_func import *
 
 app = Flask(__name__)
-cors = CORS(app)
+# cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 # ROOT
