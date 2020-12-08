@@ -16,7 +16,8 @@ if not os.getenv("SECRET_KEY"):
 
 from database_func import *
 
-app = Flask(__name__)
+app = Flask(__name__ 
+    ,static_folder='react-app',static_url_path='')
 
 # ROOT
 @app.route("/", methods=["GET", "POST"])
