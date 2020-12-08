@@ -59,7 +59,7 @@ export const removeFriend = async(ukey, fkey) => {
         body: JSON.stringify({ "userkey": ukey, "friendkey": fkey })
     }
 
-    await fetch('/removeFriend', requestOpts)
+    await fetch('https://limulus0.herokuapp.com/removeFriend', requestOpts)
 }
 
 export const getUserList = async(username) => {
