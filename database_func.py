@@ -7,7 +7,8 @@ import requests
 import random
 import json
 
-
+SQLALCHEMY_POOL_SIZE = 15
+# sqlalchemy.max_overflow = 15
 engine = create_engine(os.getenv("DATABASE_URL"), pool_timeout = 7.0)
 db = scoped_session(sessionmaker(bind=engine))
 

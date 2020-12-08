@@ -10,10 +10,14 @@ const LogIn = () => {
     function handleSubmit(event) {
         event.preventDefault()
         
+        if(username === "" || password === "") {
+            return;
+        }
+
         //Call the login api
         login(username, password).then((data) => {
             console.log(data)
-            if(data["response"] === 200) {
+            if(data["error"] === null) {
                 console.log("log in good!")
                 localStorage.setItem("token", 3)
                 localStorage.setItem("username", username)
@@ -23,6 +27,8 @@ const LogIn = () => {
                 alert("Invalid Login! Try Again.")
             }
         })
+
+
     }
 
     return (
@@ -31,10 +37,10 @@ const LogIn = () => {
                 <h1>Log In</h1>
                 <form onSubmit={handleSubmit}>
                     <label for="uname">Username: </label>
-                    <input type="text" id="uname" onChange={e => setUsername(e.target.value)}></input>
+                    <input type="text" id="uname" autocomplete="off" onChange={e => setUsername(e.target.value)}></input>
 
                     <label for="password">Password: </label>
-                    <input type="password" id="password" onChange={e => setPassword(e.target.value)}></input>
+                    <input type="password" id="password" autocomplete="off" onChange={e => setPassword(e.target.value)}></input>
 
                     <button type="submit">Submit</button>
                 </form>

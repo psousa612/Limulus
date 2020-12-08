@@ -35,19 +35,19 @@ const SignUp = () => {
                 
                 <h3>Optional Fields:</h3>
                 <label for="firstname">First Name: </label>
-                <input id="firstname" type="text" ></input>
+                <input id="firstname" type="text" autocomplete="off"></input>
           
                 <label for="lastname">Last Name: </label>
-                <input id="lastname" type="text" ></input>
+                <input id="lastname" type="text" autocomplete="off"></input>
      
                 <label for="age">Age: </label>
-                <input id="age" type="text"></input>
+                <input id="age" type="text" autocomplete="off"></input>
            
                 <label for="location">Location: </label>
-                <input id="location" type="text"></input>
+                <input id="location" type="text" autocomplete="off"></input>
             
                 <label for="school">School: </label>
-                <input id="school" type="text"></input>
+                <input id="school" type="text" autocomplete="off"></input>
 
                 <button type="submit">Submit</button>
             </form>
