@@ -103,9 +103,16 @@ def populateQuestions(url):
         db.commit()
 
 def populateUsers():
-        users = [["ySharma", "yash@yash.com", "abc123", "Yash", "Sharma", 18, None, "UCMerced", 600],
+        #username, email, password, first name, last name, age, location, school, points
+
+        users = [
+                ["ySharma", "yash@yash.com", "abc123", "Yash", "Sharma", 18, None, "UCMerced", 600],
                 ["bbridi", "bbbbbbbbridi@protonmail.com", "securePassword99", "Busher", None, 29, None, "UCMerced", 504],
-                ["psousa", "spam@gmail.com", "theseWillBeHashedEventually", None, "Sousa", 21, "San Jose", "UCMerced", 339]]
+                ["psousa", "spam@gmail.com", "theseWillBeHashedEventually", None, "Sousa", 21, "San Jose", "UCMerced", 339],
+                ["jc", "jc@jc.com", "jc", "Jairo", None, 34, None, "UCMerced", 305],
+                ["ifelsejet", "jet@jet.com", "jet", "Jet", None, 11, None, "UCMerced", 299],
+                ["bobbert", "bob@bob.com", "bob", "Bobbert", "Bob", 210, None, "UCMerced", 298],
+                ["boof", "boof@boof.com", "boof", None, None, 999, None, None, 400]]
         
         for row in users:
                 passwordHash = hashlib.sha256()

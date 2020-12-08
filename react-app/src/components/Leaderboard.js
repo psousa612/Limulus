@@ -7,10 +7,15 @@ import RowItem from './RowItem';
 
 const Leaderboard = () => {
   const [leader, setLeader] = useState({})
+  const [topFriend, setTopFriend] = useState([]);
+  const [toughestQuestion, setToughestQuestion] = useState("")
 
   useEffect( () => {
-    leaders().then((l) => {
-      setLeader(l);
+    leaders(localStorage.getItem("username")).then((l) => {
+      setLeader(l["leaderboard"]);
+      setTopFriend(l["topfriends"])
+      setToughestQuestion(l["toughestquestion"])
+      // console.log(toughestQuestion)
     })
   }, []);
 
@@ -39,6 +44,36 @@ const Leaderboard = () => {
       </tbody>
 
       </table>
+
+      <br/>
+
+      <h1>Friend Rankings</h1>
+
+      {
+        topFriend.length !== 0 ? 
+        <table>
+          <thead>
+            <th>Ranking</th>
+            <th>Username</th>
+          </thead>
+
+          <tbody>
+            { 
+            topFriend.map((value, index) => {
+              return <tr>
+                <td>{value[0]}</td>
+                <td>{value[2]}</td>
+              </tr>
+            })
+          }
+            </tbody>
+        </table>
+        : <div>
+            <p>You have no friends!</p>
+            <a href="/findfriends">Make some here!</a>
+          </div>
+      }
+
       
     </div>
   );

@@ -104,7 +104,7 @@ def user_list():
     return jsonify({"users":cleanData})
 
 # LEADERBOARD API
-@app.route("/leaderboard", methods=["GET"])
+@app.route("/leaderboard", methods=["POST"])
 def leaderboard():
     refresh_leaderboard()
     board = fetch_top10()
@@ -115,8 +115,28 @@ def leaderboard():
         data.append(row[2])
         data.append(row[3])
         finalData.append(data)
+
+    params = request.get_json()
+    username = str(params["username"])
+
+    top_friends = get_top_friends(get_userkey(username))
+    topFriendsData = []
+    for row in top_friends:
+        toInsert = []
+        toInsert.append(row[0])
+        toInsert.append(row[1])
+        toInsert.append(row[2])
+        topFriendsData.append(toInsert)
+
     
-    return jsonify({"leaderboard":finalData}),200
+    toughestQuestion = get_toughest_question()
+    toughestQuestionData = []
+    for row in toughestQuestion:
+        toughestQuestionData.append(row)
+    
+    return jsonify({"leaderboard":finalData,
+                    "topfriends":topFriendsData,
+                    "toughestquestion":toughestQuestionData}),200
 
 # Get categories API
 @app.route("/categories", methods=["GET"])
@@ -339,14 +359,14 @@ def gettoppeer():
 
 
 # Get top 10 schools
-@app.route('/get_top_schools')
+# @app.route('/get_top_schools')
 def get_top_schools():
    res = get_top_ten_school()
    rankings = {}
    for r in res:
        rankings[r[0]] = r[1]
 
-   return jsonify(rankings),200
+   return rankings
 
 # Get toughest question 
 @app.route('/get_toughest_question')

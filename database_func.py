@@ -99,6 +99,16 @@ def get_nonfriends(ukey):
                                         JOIN users ON users.user_key = friends.user_key
                                         WHERE friend_key = :ukey)""", {"ukey":ukey}).fetchall()
 
+def get_top_friends(ukey):
+    return db.execute("""SELECT ROW_NUMBER() OVER (ORDER BY points DESC), user_info.user_key, user_name FROM user_info
+                            JOIN users ON users.user_key = user_info.user_key
+                            WHERE user_info.user_key IN (
+                                SELECT friend_key FROM friends WHERE user_key = :ukey 
+                                UNION 
+                                SELECT user_key FROM friends WHERE friend_key = :ukey)
+                            ORDER BY points DESC""", {"ukey":ukey}).fetchall();
+
+
 def get_username(userkey):
     return db.execute("SELECT user_name FROM users WHERE user_key = :ukey", {"ukey":userkey}).fetchone()[0]
     
