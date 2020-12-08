@@ -17,7 +17,7 @@ const LogIn = () => {
         //Call the login api
         login(username, password).then((data) => {
             console.log(data)
-            if(data["error"] === null) {
+            if(data["error"] === undefined) {
                 console.log("log in good!")
                 localStorage.setItem("token", 3)
                 localStorage.setItem("username", username)
