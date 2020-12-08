@@ -16,14 +16,14 @@ const LogIn = () => {
 
         //Call the login api
         login(username, password).then((data) => {
-            console.log(data)
-            if(data["error"] === undefined) {
-                console.log("log in good!")
+            // console.log(data)
+            if(data !== undefined && data["user_key"]) {
+                // console.log("log in good!")
                 localStorage.setItem("token", 3)
                 localStorage.setItem("username", username)
                 History.push('/dashboard')
             } else {
-                console.log("log in bad :(")
+                // console.log("log in bad :(")
                 alert("Invalid Login! Try Again.")
             }
         })
