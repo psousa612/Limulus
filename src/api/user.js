@@ -1,13 +1,13 @@
-export const getUserInfo = async (uname) => {
+export const getUserInfo = async(uname) => {
     var data;
     // console.log(uname);
     const requestOpts = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({"user_name":uname})
+        body: JSON.stringify({ "user_name": uname })
     }
 
-    await fetch('/getuserinfo', requestOpts)
+    await fetch('https://limulus0.herokuapp.com/getuserinfo', requestOpts)
         .then(response => response.json())
         .then(d => data = d)
 
@@ -16,16 +16,16 @@ export const getUserInfo = async (uname) => {
     return data["info"];
 }
 
-export const getUserHistory = async (uname) => {
+export const getUserHistory = async(uname) => {
     var data;
 
     const requestOpts = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({"user_name":uname})
+        body: JSON.stringify({ "user_name": uname })
     }
 
-    await fetch('/questionhistory', requestOpts)
+    await fetch('https://limulus0.herokuapp.com/questionhistory', requestOpts)
         .then(response => response.json())
         .then(d => data = d)
 
@@ -34,16 +34,16 @@ export const getUserHistory = async (uname) => {
     return data["history"];
 }
 
-export const getFriends = async (uname) => {
+export const getFriends = async(uname) => {
     var data;
 
     const requestOpts = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({"user_name":uname})
+        body: JSON.stringify({ "user_name": uname })
     }
 
-    await fetch('/getFriends', requestOpts)
+    await fetch('https://limulus0.herokuapp.com/getFriends', requestOpts)
         .then(response => response.json())
         .then(d => data = d)
 
@@ -52,25 +52,25 @@ export const getFriends = async (uname) => {
     return data["friends"];
 }
 
-export const removeFriend = async (ukey, fkey) => {
+export const removeFriend = async(ukey, fkey) => {
     const requestOpts = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({"userkey":ukey, "friendkey":fkey})
+        body: JSON.stringify({ "userkey": ukey, "friendkey": fkey })
     }
 
     await fetch('/removeFriend', requestOpts)
 }
 
-export const getUserList = async (username) => {
+export const getUserList = async(username) => {
     var data
     const requestOpts = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({"username":username})
+        body: JSON.stringify({ "username": username })
     }
 
-    await fetch('/getNonFriends', requestOpts)
+    await fetch('https://limulus0.herokuapp.com/getNonFriends', requestOpts)
         .then(response => response.json())
         .then(d => data = d)
 
@@ -79,19 +79,18 @@ export const getUserList = async (username) => {
     return data["users"]
 }
 
-export const addFriend = async (username, friendkey) => {
+export const addFriend = async(username, friendkey) => {
 
     const requestOpts = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({"username":username, "friendkey":friendkey})
+        body: JSON.stringify({ "username": username, "friendkey": friendkey })
     }
 
-    await fetch('/addFriend', requestOpts)
+    await fetch('https://limulus0.herokuapp.com/addFriend', requestOpts)
         .then(response => response.json())
 
     // console.log("From API: ")
     // console.log(data)
     // return data["users"]
 }
-

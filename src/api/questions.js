@@ -1,7 +1,7 @@
-export const getCategories = async () => {
+export const getCategories = async() => {
     var data;
 
-    await fetch('/categories')
+    await fetch('https://limulus0.herokuapp.com/categories')
         .then(response => response.json())
         .then(d => data = d)
 
@@ -15,41 +15,41 @@ export const getCategories = async () => {
     return data["categories"];
 }
 
-export const getQuestion = async () => {
+export const getQuestion = async() => {
     var data;
 
     const requestOpts = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({"category":localStorage.getItem("cat"), "username":localStorage.getItem("username")})
+        body: JSON.stringify({ "category": localStorage.getItem("cat"), "username": localStorage.getItem("username") })
     }
 
-    await fetch('/nextquestion', requestOpts)
+    await fetch('https://limulus0.herokuapp.com/nextquestion', requestOpts)
         .then(response => response.json())
         .then(d => data = d)
 
     // console.log("From API: ")
     // console.log(data)
-    
-    
+
+
     return data["question"];
 }
 
-export const answeredQuestion = async (uname, qkey, correct,) => {
+export const answeredQuestion = async(uname, qkey, correct, ) => {
     var data;
 
     // console.log("--Params ")
     // console.log("uname; ", uname)
     // console.log("qkey: ", qkey)
     // console.log("correct: ", correct)
-    
+
     const requestOpts = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({"user_name":uname, "qkey":qkey, "result":correct})
+        body: JSON.stringify({ "user_name": uname, "qkey": qkey, "result": correct })
     }
 
-    await fetch('/answeredquestion', requestOpts)
+    await fetch('https://limulus0.herokuapp.com/answeredquestion', requestOpts)
         .then(response => response.json())
         .then(d => data = d)
 
@@ -58,16 +58,16 @@ export const answeredQuestion = async (uname, qkey, correct,) => {
     return data["points"];
 }
 
-export const getQuestionStats = async (qkey) => {
+export const getQuestionStats = async(qkey) => {
     var data;
 
     const requestOpts = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({"questionkey":qkey})
+        body: JSON.stringify({ "questionkey": qkey })
     }
 
-    await fetch('/questionstats', requestOpts)
+    await fetch('https://limulus0.herokuapp.com/questionstats', requestOpts)
         .then(response => response.json())
         .then(d => data = d)
 
@@ -76,16 +76,16 @@ export const getQuestionStats = async (qkey) => {
     return data;
 }
 
-export const pushNewQuestion = async (info, username) => {
+export const pushNewQuestion = async(info, username) => {
     var data;
 
     const requestOpts = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({"username":username, "info":info})
+        body: JSON.stringify({ "username": username, "info": info })
     }
 
-    await fetch('/addQuestion', requestOpts)
+    await fetch('https://limulus0.herokuapp.com/addQuestion', requestOpts)
         .then(response => response.json())
         .then(d => data = d)
 

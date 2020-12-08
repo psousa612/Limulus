@@ -1,15 +1,15 @@
-export const login = async (username, password) => {
-    
+export const login = async(username, password) => {
+
     const requestOpts = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({"username":username, "password":password})
+        body: JSON.stringify({ "username": username, "password": password })
     }
 
     var data;
     var status;
 
-    await fetch('/login', requestOpts)
+    await fetch('https://limulus0.herokuapp.com/login', requestOpts)
         .then(response => {
             response.json();
             status = response.status;
@@ -17,25 +17,25 @@ export const login = async (username, password) => {
         .then(d => data = d)
     console.log(data);
     console.log(status);
-    
+
     return {
-        "data":data,
-        "response":status
+        "data": data,
+        "response": status
     };
 }
 
-export const signup = async (info) => {
+export const signup = async(info) => {
     var data
     const requestOpts = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({"info":info})
+        body: JSON.stringify({ "info": info })
     }
 
-    await fetch('/signup', requestOpts)
+    await fetch('https://limulus0.herokuapp.com/signup', requestOpts)
         .then(response => response.json())
         .then(d => data = d)
-        
+
     // console.log(data);
     // console.log(status);
     return data
