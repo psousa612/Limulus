@@ -1,7 +1,7 @@
 export const getCategories = async () => {
     var data;
 
-    await fetch('/categories')
+    await fetch('https://limulus0.herokuapp.com/categories')
         .then(response => response.json())
         .then(d => data = d)
 
@@ -24,7 +24,7 @@ export const getQuestion = async () => {
         body: JSON.stringify({"category":localStorage.getItem("cat"), "username":localStorage.getItem("username")})
     }
 
-    await fetch('/nextquestion', requestOpts)
+    await fetch('https://limulus0.herokuapp.com/nextquestion', requestOpts)
         .then(response => response.json())
         .then(d => data = d)
 
@@ -49,7 +49,7 @@ export const answeredQuestion = async (uname, qkey, correct,) => {
         body: JSON.stringify({"user_name":uname, "qkey":qkey, "result":correct})
     }
 
-    await fetch('/answeredquestion', requestOpts)
+    await fetch('https://limulus0.herokuapp.com/answeredquestion', requestOpts)
         .then(response => response.json())
         .then(d => data = d)
 
@@ -67,7 +67,7 @@ export const getQuestionStats = async (qkey) => {
         body: JSON.stringify({"questionkey":qkey})
     }
 
-    await fetch('/questionstats', requestOpts)
+    await fetch('https://limulus0.herokuapp.com/questionstats', requestOpts)
         .then(response => response.json())
         .then(d => data = d)
 
@@ -85,7 +85,7 @@ export const pushNewQuestion = async (info, username) => {
         body: JSON.stringify({"username":username, "info":info})
     }
 
-    await fetch('/addQuestion', requestOpts)
+    await fetch('https://limulus0.herokuapp.com/addQuestion', requestOpts)
         .then(response => response.json())
         .then(d => data = d)
 

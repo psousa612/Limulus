@@ -1,7 +1,7 @@
 export const leaders = async () => {
     var l;
     
-    await fetch('/leaderboard')
+    await fetch('https://limulus0.herokuapp.com/leaderboard')
         .then(response => response.json())
         .then(data => l = data)
 

@@ -15,9 +15,11 @@ const LogIn = () => {
         }
 
         //Call the login api
+        
         login(username, password).then((data) => {
             console.log(data)
-            if(data["error"] === undefined) {
+            
+            if(data !== undefined && data["user_key"]) {
                 console.log("log in good!")
                 localStorage.setItem("token", 3)
                 localStorage.setItem("username", username)

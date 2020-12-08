@@ -7,21 +7,16 @@ export const login = async (username, password) => {
     }
 
     var data;
-    var status;
 
-    await fetch('/login', requestOpts)
-        .then(response => {
-            response.json();
-            status = response.status;
-        })
+    await fetch('https://limulus0.herokuapp.com/login', requestOpts)
+        .then(response => response.json())
         .then(d => data = d)
+        
+    console.log("From the API:")
     console.log(data);
-    console.log(status);
+    console.log("_______")
     
-    return {
-        "data":data,
-        "response":status
-    };
+    return data;
 }
 
 export const signup = async (info) => {
@@ -32,7 +27,7 @@ export const signup = async (info) => {
         body: JSON.stringify({"info":info})
     }
 
-    await fetch('/signup', requestOpts)
+    await fetch('https://limulus0.herokuapp.com/signup', requestOpts)
         .then(response => response.json())
         .then(d => data = d)
         

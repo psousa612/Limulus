@@ -7,7 +7,7 @@ export const getUserInfo = async (uname) => {
         body: JSON.stringify({"user_name":uname})
     }
 
-    await fetch('/getuserinfo', requestOpts)
+    await fetch('https://limulus0.herokuapp.com/getuserinfo', requestOpts)
         .then(response => response.json())
         .then(d => data = d)
 
@@ -25,7 +25,7 @@ export const getUserHistory = async (uname) => {
         body: JSON.stringify({"user_name":uname})
     }
 
-    await fetch('/questionhistory', requestOpts)
+    await fetch('https://limulus0.herokuapp.com/questionhistory', requestOpts)
         .then(response => response.json())
         .then(d => data = d)
 
@@ -43,7 +43,7 @@ export const getFriends = async (uname) => {
         body: JSON.stringify({"user_name":uname})
     }
 
-    await fetch('/getFriends', requestOpts)
+    await fetch('https://limulus0.herokuapp.com/getFriends', requestOpts)
         .then(response => response.json())
         .then(d => data = d)
 
@@ -59,7 +59,7 @@ export const removeFriend = async (ukey, fkey) => {
         body: JSON.stringify({"userkey":ukey, "friendkey":fkey})
     }
 
-    await fetch('/removeFriend', requestOpts)
+    await fetch('https://limulus0.herokuapp.com/removeFriend', requestOpts)
 }
 
 export const getUserList = async (username) => {
@@ -70,7 +70,7 @@ export const getUserList = async (username) => {
         body: JSON.stringify({"username":username})
     }
 
-    await fetch('/getNonFriends', requestOpts)
+    await fetch('https://limulus0.herokuapp.com/getNonFriends', requestOpts)
         .then(response => response.json())
         .then(d => data = d)
 
@@ -87,7 +87,7 @@ export const addFriend = async (username, friendkey) => {
         body: JSON.stringify({"username":username, "friendkey":friendkey})
     }
 
-    await fetch('/addFriend', requestOpts)
+    await fetch('https://limulus0.herokuapp.com/addFriend', requestOpts)
         .then(response => response.json())
 
     // console.log("From API: ")

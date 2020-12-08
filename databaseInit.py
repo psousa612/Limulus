@@ -70,6 +70,9 @@ def database_init():
         populateQuestions("https://opentdb.com/api.php?amount=30&category=19&type=multiple")
         populateQuestions("https://opentdb.com/api.php?amount=30&category=30&type=multiple")
         populateQuestions("https://opentdb.com/api.php?amount=30&category=15&type=multiple")
+        populateQuestions("https://opentdb.com/api.php?amount=30&category=17&type=multiple")
+        populateQuestions("https://opentdb.com/api.php?amount=30&category=12&type=multiple")
+        populateQuestions("https://opentdb.com/api.php?amount=30&category=9&type=multiple")
 
         populateUsers()
         populateFriends()
