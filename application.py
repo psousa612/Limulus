@@ -126,6 +126,7 @@ def leaderboard():
         toInsert.append(row[0])
         toInsert.append(row[1])
         toInsert.append(row[2])
+        toInsert.append(row[3])
         topFriendsData.append(toInsert)
 
     
