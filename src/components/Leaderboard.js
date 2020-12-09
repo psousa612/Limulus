@@ -55,6 +55,7 @@ const Leaderboard = () => {
           <thead>
             <th>Ranking</th>
             <th>Username</th>
+            <th>Points</th>
           </thead>
 
           <tbody>
@@ -63,6 +64,7 @@ const Leaderboard = () => {
               return <tr>
                 <td>{value[0]}</td>
                 <td>{value[2]}</td>
+                <td>{value[3]}</td>
               </tr>
             })
           }
